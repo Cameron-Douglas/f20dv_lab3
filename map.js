@@ -1,7 +1,7 @@
 let projection = d3.geoMercator()
 	.scale(140)
 	.translate([750, 600])
-	.center([0, 5]);
+	
 
 let geoGenerator = d3.geoPath()
 	.projection(projection);
