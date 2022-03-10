@@ -21,6 +21,8 @@ d3.csv(locations, function(data) {
 
     let isoCode = "AFG";
 
+
+    // Populating worldData Map
     for(let i = 0; i<data.length; i++){
         countryData = data[i];
         if(data[i].iso_code == isoCode){
@@ -68,18 +70,54 @@ d3.csv(locations, function(data) {
 });
 
 function initialise(iso){
-    totalCases = [];
-    let prevValue = 0;
 
+    let totalVaccinated = [];
+    let vaxData = [];
+
+    let prevValuePV = 0;
+    let prevValuePFV = 0;
+    let prevValueUV = 0;
+
+    // Building dataset for number of people vaccinated for line chart
     for(let i = 0; i<worldData.get(iso).length;i++){
-        let totalVacc = parseInt(worldData.get(iso)[i].total_vaccinations);
-        if(isNaN(totalVacc)){
-            totalVacc = prevValue;
-        }   
-        totalCases.push({x:i,y:totalVacc});
-        prevValue = totalVacc;
-}   
-    drawChart(totalCases, worldData.get(iso)[0].location)
+
+        let totalvax = parseInt(worldData.get(iso)[i].people_vaccinated);
+        let fullvax = parseInt(worldData.get(iso)[i].people_fully_vaccinated)
+        
+        if(isNaN(totalvax)){
+            totalvax = prevValuePV;
+        }  
+        if(isNaN(fullvax)){
+            fullvax = prevValuePFV;
+        } 
+
+        let unvax = parseInt(worldData.get(iso)[i].population) - totalvax
+
+        if(isNaN(unvax)){
+            unvax = prevValueUV;
+        }  
+
+        totalVaccinated.push({x:i,y:totalvax});
+        vaxData.push({x:totalvax,y:fullvax,z:unvax});
+        
+
+        prevValuePV = totalvax;
+        prevValuePFV = fullvax;
+        prevValueUV = unvax;
+    
+    } 
+    updateChart(totalVaccinated, worldData.get(iso)[0].location);
+
+
+    let vaxLastIndex = vaxData.length - 1 ;
+    console.log(vaxData[vaxLastIndex]);
+    let pieData = []
+    pieData.push(vaxData[vaxLastIndex].x,vaxData[vaxLastIndex].y,vaxData[vaxLastIndex].z);
+    console.log(pieData)
+
+    drawPie(pieData);
+    
+    
 }
 
 
@@ -87,23 +125,23 @@ function onSelection(iso){
     console.log(iso)
     console.log(worldData.get(iso));
 
-    totalCases = [];
-    //totalCasesStacked = [];
+    totalVaccinated = [];
+  
     prevValue = 0;
 
     for(let i = 0; i<worldData.get(iso).length;i++){
 
-        let totalVacc = parseInt(worldData.get(iso)[i].total_vaccinations);
+        let totalvax = parseInt(worldData.get(iso)[i].people_vaccinated);
        
-        if(isNaN(totalVacc)){
-            totalVacc = prevValue;
+        if(isNaN(totalvax)){
+            totalvax = prevValue;
         }
 
-        totalCases.push({x:i,y:totalVacc});
+        totalVaccinated.push({x:i,y:totalvax});
 
-        prevValue = totalVacc;
+        prevValue = totalvax;
     }
-    updateChart(totalCases, worldData.get(iso)[0].location);
+    updateChart(totalVaccinated, worldData.get(iso)[0].location);
     
 }
 

@@ -1,7 +1,7 @@
 // Modified from code example: https://www.d3indepth.com/geographic/
 
-const width = 900;
-const height = 650;
+const width = 750;
+const height = 475;
 
 let selected = "Afghanistan";
 let selectedISO = "AFG";
@@ -19,8 +19,8 @@ d3.select("body")
         .attr("class","map");
 
 let projection = d3.geoMercator()
-	.scale(140)
-	.translate([450, 450])
+	.scale(110)
+	.translate([375, 325])
 	
 
 let geoGenerator = d3.geoPath()
@@ -38,6 +38,7 @@ function update(geojson) {
 		.attr('d', geoGenerator)
         .attr("class",d=>{return d.properties.ISO_A3})
         .on('click', function(event,d,i){
+            // https://stackoverflow.com/questions/18005600/setting-a-color-for-click-event-on-a-d3-map
             d3.select("#selected")  
                 .attr("id","unselected");
 
