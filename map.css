@@ -1,0 +1,38 @@
+body{
+    font-family: monospace;
+    color:darkslategrey;
+}
+
+#selected{
+    fill: green;
+}
+
+#unselected{
+    fill: #aaa;         
+}
+
+.map path {
+    fill: #aaa;
+    stroke: steelblue;
+}
+
+.map_container{
+    width: 750px;
+    float:left;
+   
+}
+.chart_container{
+    width: 1200px;
+    float:right;
+    
+}
+.pie_container{
+    width:750px;
+    
+}  
+
+form{
+    float:left;
+    vertical-align: middle;
+}
+    
