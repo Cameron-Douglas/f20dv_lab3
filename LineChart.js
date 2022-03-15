@@ -3,6 +3,8 @@ const margin = 150;
 const xMax = xSize - margin*2;
 const yMax = ySize - margin*2;
 
+const transitionSpeed = 1000;
+
 /* Get the 'limits' of the data - the full extent (mins and max)
 so the plotted data fits perfectly */
 
@@ -15,6 +17,8 @@ let x;
 //Y Axis
 let y;
 
+let ChartCounter = 0;
+
 const svg = d3.select("body")
 .append("div")
 .attr("class","chart_container")
@@ -24,8 +28,34 @@ const svg = d3.select("body")
 .append("g")
 .attr("transform","translate(" + margin + "," + 75 + ")");
 
+var form = d3.select(".chart_container").append("form");
 
-function setupAxes(data, country){
+inputs = form.selectAll("label")
+    .data(radioOptions)
+    .enter()
+    .append("div")
+        .attr("class","radio")
+        .append("text")
+        .text(function(d) {return d;})
+        .append("input")
+        .attr("type","radio")
+        .attr("class","shape")
+        .attr("name","mode")
+        .property("checked", function(d, i) { 
+            return (i===j); 
+        })
+        .attr("value", function(d, i) {return i;})
+
+
+        let formSelection = d3.select("form");
+        formSelection.on("change",function(event){
+            change(event.target.__data__)});
+        
+        function change(d){
+            initialise(selectedISO,"max",d)
+        }
+
+function setupAxes(data, country, category){
 
     /* Get the 'limits' of the data - the full extent (mins and max)
     so the plotted data fits perfectly */
@@ -47,22 +77,30 @@ function setupAxes(data, country){
     svg.append("g")
         .attr("transform", "translate(0," + yMax + ")")
         .attr("class","axis")
+        .transition()
+        .duration(transitionSpeed)
         .call(d3.axisBottom(x))
 
     //top
     svg.append("g")
         .attr("class","axis")
+        .transition()
+        .duration(transitionSpeed)
         .call(d3.axisTop(x));
 
     //left y axis
     svg.append("g")
         .attr("class","axis")
+        .transition()
+        .duration(transitionSpeed)
         .call(d3.axisLeft(y));
 
     //right y axis
     svg.append("g")
         .attr("class","axis")
         .attr("transform", `translate(${xMax},0)`)
+         .transition()
+        .duration(transitionSpeed)
         .call(d3.axisRight(y));
 
     svg.append("text")
@@ -81,21 +119,29 @@ function setupAxes(data, country){
         .attr("x", 0)
         .attr("y",-50)
         .attr("class","chartLabel")
-        .text(country + " Covid Vaccinations Over Time")
+        .text(country + " Covid " + category + " Over Time")
         .style("font-size","19px")
 
     svg.append("text")
         .attr("x",5)
         .attr("y",15)
         .attr("class","chartLabel")
-        .text("People Vaccinated: ")
+        .text(category+":")
+        .attr("font-weight","bold")
+
+    svg.append("text")
+        .attr("x",5)
+        .attr("y",45)
+        .attr("class","chartLabel")
+        .text("Day: ")
+        .attr("font-weight","bold")
 }
 
-function updateChart(data, country){
+function updateChart(data, country, iso, category){
      
     let tmp = [];
 
-    let u = svg.selectAll(".chartPath")
+    let u = svg.selectAll(".line")
         .data(tmp)
         .exit()
         .remove()
@@ -114,19 +160,33 @@ function updateChart(data, country){
         .data(tmp)
         .exit()
         .remove()
-
-    setupAxes(data, country);
     
-    svg.append("path")
-        .datum(data)
-        .attr("fill", "none")
-        .attr("stroke", "steelblue")
-        .attr("stroke-width", 2.25)
-        .attr("class","chartPath")
+    svg.selectAll(".label")
+        .data(tmp)
+        .exit()
+        .remove();
+
+    setupAxes(data, country, category);
+    
+    let arr = [1];
+
+    var l = svg.selectAll(".line")
+        .data([data],d=>d.x)
+
+    l.enter()
+        .append("path")
+        .attr("class","line")
+        .merge(u)
+        .transition()
+        .duration(transitionSpeed)
         .attr("d", d3.line()
         .x(function(d) { return x(d.x) })
         .y(function(d) { return y(d.y) })
-        );
+        )
+        .attr("stroke", "steelblue")
+        .attr("fill", "none")
+        .attr("stroke-width", 2.25);
+
 
     svg.selectAll("dot")
         .data(data)
@@ -150,13 +210,23 @@ function updateChart(data, country){
                 .style("opacity",1.0)
             
             svg.append("text")
-                .attr("x", 135) 
-                .attr("y", 15)
+                .attr("x", 5) 
+                .attr("y", 30)
                 .attr("class","label")
                 .text(d.y)
+
+            svg.append("text")
+                .attr("x", 5) 
+                .attr("y", 60)
+                .attr("class","label")
+                .text(d.x)
         })
         .on("mouseout",function(event,d,i){
             d3.select(this)
                 .style("opacity",0)
+        })
+        .on("click",function(event,d,i){
+            initialisePie(iso,d.x); // TODO -- Potential Change Category?
         });
+
 }

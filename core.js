@@ -1,11 +1,18 @@
 let locations = 'https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv';
-let vaccinations = 'https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/vaccinations/country_data/';
 
 const dropdownContainer = d3.select("body")
     .append("div")
     .attr("id","dropdown-container")
 
 let worldData = new Map();
+
+let totalVaccinated = [];
+let vaxData = [];
+
+let totalTests = [];
+let totalHospitalisations = [];
+let totalDeaths = [];
+
 
 console.log("Building Data...")
 
@@ -21,7 +28,6 @@ d3.csv(locations, function(data) {
 
     let isoCode = "AFG";
 
-
     // Populating worldData Map
     for(let i = 0; i<data.length; i++){
         countryData = data[i];
@@ -36,43 +42,60 @@ d3.csv(locations, function(data) {
         
     }
 
-    let locs = [];
-
-    worldData.forEach((value,key)=>locs.push(key))
+    // let locs = [];
+  
+    // worldData.forEach((value,key)=>locs.push(key));
 
     console.log("Ready...")
 
-//    // Creating dropdown
-
-//     var dropdown = d3.select("#dropdown-container")
-//         .append("select")
-//         .attr("class","selection")
-//         .attr("id","dropdown")
-//         .attr("name","country-list");
-
-//     var options = dropdown.selectAll("option")
-//         .data(locs)
-//         .enter()
-//         .append("option")
-
-    
-//     options.text(d=>{ return worldData.get(d)[0].location;})
-//             .attr("value",d=>{return d;});
-
-
-//     d3.select("select")
-//         .on("change",d=>{ var selected = d3.select("#dropdown").node().value; onSelection(selected);})
-
     let iso = "GBR";
 
-    initialise(iso)
+    initialise(iso,768,"Vaccinations")
     
 });
 
-function initialise(iso){
+function initialise(iso, day, category){
 
-    let totalVaccinated = [];
-    let vaxData = [];
+    buildVaxData(iso);
+
+    if(category === "Vaccinations"){
+        console.log(totalVaccinated)
+        updateChart(totalVaccinated, worldData.get(iso)[0].location, iso, category);
+    }
+    if(category === "Tests"){
+        buildTestData(iso);
+        updateChart(totalTests, worldData.get(iso)[0].location, iso, category);
+    }
+    if(category === "Hospitalisations"){
+        buildHospitalData(iso);
+        updateChart(totalHospitalisations, worldData.get(iso)[0].location, iso, category);
+    }
+    if(category === "Deaths"){
+        buildDeathData(iso);
+        updateChart(totalDeaths, worldData.get(iso)[0].location, iso, category);
+    }
+
+    initialisePie(iso,day)
+
+}
+
+function initialisePie(iso,day){
+    if(day === "max"){
+        day = vaxData.length-1
+    }
+    
+    console.log(vaxData[day])
+    let pieData = []
+    pieData.push(vaxData[day].x,vaxData[day].y,vaxData[day].z);
+    console.log(pieData) 
+
+    updatePie(vaxData,pieData,worldData.get(iso)[0].location,iso,day);
+}
+
+function buildVaxData(iso){
+
+    totalVaccinated = [];
+    vaxData = [];
 
     let prevValuePV = 0;
     let prevValuePFV = 0;
@@ -106,49 +129,60 @@ function initialise(iso){
         prevValueUV = unvax;
     
     } 
-    updateChart(totalVaccinated, worldData.get(iso)[0].location);
-
-
-    let vaxLastIndex = vaxData.length - 1 ;
-    console.log(vaxData[vaxLastIndex]);
-    let pieData = []
-    pieData.push(vaxData[vaxLastIndex].x,vaxData[vaxLastIndex].y,vaxData[vaxLastIndex].z);
-    console.log(pieData)
-
-    drawPie(pieData);
-    
-    
 }
 
-
-function onSelection(iso){
-    console.log(iso)
-    console.log(worldData.get(iso));
-
-    totalVaccinated = [];
-  
-    prevValue = 0;
-
+function buildTestData(iso){
+    totalTests = [];
+    let prevValue = 0;
+    // Building dataset for number of people vaccinated for line chart
     for(let i = 0; i<worldData.get(iso).length;i++){
 
-        let totalvax = parseInt(worldData.get(iso)[i].people_vaccinated);
-       
-        if(isNaN(totalvax)){
-            totalvax = prevValue;
-        }
-
-        totalVaccinated.push({x:i,y:totalvax});
-
-        prevValue = totalvax;
-    }
-    updateChart(totalVaccinated, worldData.get(iso)[0].location);
-    
+        let totaltest = parseInt(worldData.get(iso)[i].total_tests);
+        
+        if(isNaN(totaltest)){
+            totaltest = prevValue;
+        }  
+        totalTests.push({x:i,y:totaltest});
+        prevValue = totaltest;
+      
+    } 
 }
 
-function changeSelected(iso){
-    console.log(worldData.get(iso)[0].location);
+function buildHospitalData(iso){
+    totalHospitalisations = [];
+    let prevValue = 0;
+    // Building dataset for number of people vaccinated for line chart
+    for(let i = 0; i<worldData.get(iso).length;i++){
 
-    d3.select('#dropdown').property('value', worldData.get(iso)[0].location);
+        let totalhosp = parseInt(worldData.get(iso)[i].hosp_patients);
+        
+        if(isNaN(totalhosp)){
+            totalhosp = prevValue;
+        }  
+        totalHospitalisations.push({x:i,y:totalhosp});
+        prevValue = totalhosp;
+      
+    } 
 }
+
+function buildDeathData(iso){
+    totalDeaths = [];
+    let prevValue = 0;
+    // Building dataset for number of people vaccinated for line chart
+    for(let i = 0; i<worldData.get(iso).length;i++){
+
+        let totaldeath = parseInt(worldData.get(iso)[i].total_deaths);
+        
+        if(isNaN(totaldeath)){
+            totaldeath = prevValue;
+        }  
+        totalDeaths.push({x:i,y:totaldeath});
+        prevValue = totaldeath;
+      
+    } 
+}
+
+
+
 
 
