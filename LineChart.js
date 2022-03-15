@@ -12,10 +12,10 @@ let xExtent;
 let yExtent;
 
 //X Axis
-let x;
+let x = d3.scaleLinear();
 
 //Y Axis
-let y;
+let y = d3.scaleLinear();
 
 let ChartCounter = 0;
 
@@ -64,99 +64,90 @@ function setupAxes(data, country, category){
     yExtent = d3.extent( data, d=>{ return d.y } );
 
     //X Axis
-    x = d3.scaleLinear()
-        .domain([ xExtent[0], xExtent[1] ])
+    x.domain([ xExtent[0], xExtent[1] ])
         .range([0, xMax]);
 
      //Y Axis
-    y = d3.scaleLinear()
-        .domain([ yExtent[0], yExtent[1] ])
+    y.domain([ yExtent[0], yExtent[1] ])
         .range([ yMax, 0]);
 
     //bottom
     svg.append("g")
         .attr("transform", "translate(0," + yMax + ")")
-        .attr("class","axis")
+        .attr("class","Xaxis")
         .transition()
         .duration(transitionSpeed)
         .call(d3.axisBottom(x))
 
     //top
     svg.append("g")
-        .attr("class","axis")
+        .attr("class","Topaxis")
         .transition()
         .duration(transitionSpeed)
         .call(d3.axisTop(x));
 
     //left y axis
     svg.append("g")
-        .attr("class","axis")
+        .attr("class","Yaxis")
         .transition()
         .duration(transitionSpeed)
         .call(d3.axisLeft(y));
 
     //right y axis
     svg.append("g")
-        .attr("class","axis")
+        .attr("class","Rightaxis")
         .attr("transform", `translate(${xMax},0)`)
          .transition()
         .duration(transitionSpeed)
         .call(d3.axisRight(y));
 
-    svg.append("text")
-        .attr("x", xMax/2 - 50)
-        .attr("y", yMax + 50)
-        .attr("class","chartLabel")
-        .text("Day Number")
+}
 
-    svg.append("text")
-        .attr("x", "-137.5")
-        .attr("y", yMax/2)
-        .attr("class","chartLabel")
-        .text("Vaccinated")
+function updateAxes(data,country,category){
+    
+    xExtent = d3.extent( data, d=>{ return d.x } );
+    yExtent = d3.extent( data, d=>{ return d.y } );
 
-    svg.append("text")
-        .attr("x", 0)
-        .attr("y",-50)
-        .attr("class","chartLabel")
-        .text(country + " Covid " + category + " Over Time")
-        .style("font-size","19px")
+    //X Axis
+    x.domain([ xExtent[0], xExtent[1] ])
+        .range([0, xMax]);
 
-    svg.append("text")
-        .attr("x",5)
-        .attr("y",15)
-        .attr("class","chartLabel")
-        .text(category+":")
-        .attr("font-weight","bold")
+     //Y Axis
+    y.domain([ yExtent[0], yExtent[1] ])
+        .range([ yMax, 0]);
 
-    svg.append("text")
-        .attr("x",5)
-        .attr("y",45)
-        .attr("class","chartLabel")
-        .text("Day: ")
-        .attr("font-weight","bold")
+    svg.selectAll(".Xaxis")
+        .transition()
+        .duration(transitionSpeed)
+        .call(d3.axisBottom(x))
+
+    svg.selectAll(".Yaxis")
+        .transition()
+        .duration(transitionSpeed)
+        .call(d3.axisLeft(y))
+
+    svg.selectAll(".Rightaxis")
+        .transition()
+        .duration(transitionSpeed)
+        .call(d3.axisRight(y))
+    
+    svg.selectAll(".Topaxis")
+        .transition()
+        .duration(transitionSpeed)
+        .call(d3.axisTop(x))
 }
 
 function updateChart(data, country, iso, category){
      
     let tmp = [];
-
-    let u = svg.selectAll(".line")
+    
+    
+    svg.selectAll(".marker")
         .data(tmp)
         .exit()
         .remove()
     
-    let v = svg.selectAll(".axis")
-        .data(tmp)
-        .exit()
-        .remove()
-    
-    let t = svg.selectAll(".marker")
-        .data(tmp)
-        .exit()
-        .remove()
-    
-    let w = svg.selectAll(".chartLabel")
+    svg.selectAll(".chartLabel")
         .data(tmp)
         .exit()
         .remove()
@@ -166,7 +157,7 @@ function updateChart(data, country, iso, category){
         .exit()
         .remove();
 
-    setupAxes(data, country, category);
+    updateAxes(data)
     
     let arr = [1];
 
@@ -176,7 +167,7 @@ function updateChart(data, country, iso, category){
     l.enter()
         .append("path")
         .attr("class","line")
-        .merge(u)
+        .merge(l)
         .transition()
         .duration(transitionSpeed)
         .attr("d", d3.line()
@@ -229,4 +220,36 @@ function updateChart(data, country, iso, category){
             initialisePie(iso,d.x); // TODO -- Potential Change Category?
         });
 
+        svg.append("text")
+        .attr("x", xMax/2 - 50)
+        .attr("y", yMax + 50)
+        .attr("class","chartLabel")
+        .text("Day Number")
+
+    svg.append("text")
+        .attr("x", "-137.5")
+        .attr("y", yMax/2)
+        .attr("class","chartLabel")
+        .text("Vaccinated")
+
+    svg.append("text")
+        .attr("x", 0)
+        .attr("y",-50)
+        .attr("class","chartLabel")
+        .text(country + " Covid " + category + " Over Time")
+        .style("font-size","19px")
+
+    svg.append("text")
+        .attr("x",5)
+        .attr("y",15)
+        .attr("class","chartLabel")
+        .text(category+":")
+        .attr("font-weight","bold")
+
+    svg.append("text")
+        .attr("x",5)
+        .attr("y",45)
+        .attr("class","chartLabel")
+        .text("Day: ")
+        .attr("font-weight","bold")
 }

@@ -16,9 +16,9 @@ d3.select("body")
     
     .append("svg")
     .attr("width", width)
+    .attr("height",height)
     .style("background-color","lightblue")
     .style("border-radius","24px")
-    .attr("height",height)
         .append("g")
         .attr("class","map");
 
@@ -43,6 +43,7 @@ function update(geojson) {
 		.attr('d', geoGenerator)
         .attr("class",d=>{return d.properties.iso_a3})
         .on('click', function(event,d,i){
+
             // https://stackoverflow.com/questions/18005600/setting-a-color-for-click-event-on-a-d3-map
             d3.select("#selected")  
                 .attr("id","unselected");
@@ -50,18 +51,19 @@ function update(geojson) {
             d3.select(this)
                 .attr("id","selected");
             
-            
+            if(d.properties.iso_a3==="PRK"){
 
-            selected = d.properties.name_long 
-            selectedISO = d.properties.iso_a3
-            console.log("Selected: " + selected + ", " + selectedISO)
-            initialise(selectedISO,"max","Vaccinations");
+            } else{
+                selected = d.properties.name_long 
+                selectedISO = d.properties.iso_a3
+                console.log("Selected: " + selected + ", " + selectedISO)
+                initialise(selectedISO,"max","Vaccinations");
 
-            d3.select(".shape")
-            .property("checked", function(d, i) { 
-                return (i===j); 
-            });
-          
+                d3.select(".shape")
+                .property("checked", function(d, i) { 
+                    return (i===j); 
+                });
+            }
         })
 		.on('mouseover', function(event,d,i){
             let centroid = geoGenerator.centroid(d);
@@ -72,10 +74,10 @@ function update(geojson) {
                 .exit()
                 .remove()
 
-            if(d.properties.ISO_A3==="PRK"){
+            if(d.properties.iso_a3==="PRK"){
                 d3.select("svg").append("text")
                     .attr("class","country_label")
-                    .text(d.properties.name_long  + ": No Data")
+                    .text("North Korea: No Data")
                     .attr("x",width/2)
                     .attr("y",25)
                     .style("font-size","19px")
@@ -92,6 +94,7 @@ function update(geojson) {
                 // .attr('transform', 'translate(' + centroid + ')');
         })
         .on('mouseleave', function(event,d,i){
+            
             let tmp = [];
             
             d3.select(".country_label")

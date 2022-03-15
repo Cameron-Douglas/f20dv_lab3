@@ -9,6 +9,8 @@ let worldData = new Map();
 let totalVaccinated = [];
 let vaxData = [];
 
+let initCounter = 0;
+
 let totalTests = [];
 let totalHospitalisations = [];
 let totalDeaths = [];
@@ -57,6 +59,11 @@ d3.csv(locations, function(data) {
 function initialise(iso, day, category){
 
     buildVaxData(iso);
+
+    if(initCounter === 0){
+        setupAxes(totalVaccinated, worldData.get(iso)[0].location, category);
+        initCounter++;
+    }
 
     if(category === "Vaccinations"){
         console.log(totalVaccinated)
