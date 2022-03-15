@@ -9,6 +9,8 @@ let worldData = new Map();
 let totalVaccinated = [];
 let vaxData = [];
 
+var color;
+
 let initCounter = 0;
 
 let totalTests = [];
@@ -44,17 +46,38 @@ d3.csv(locations, function(data) {
         
     }
 
-    // let locs = [];
+    let deaths = [];
   
     // worldData.forEach((value,key)=>locs.push(key));
+    
+    worldData.forEach(function(value){
+        deaths.push(value[value.length-1].total_cases_per_million)
+    })
+
+    color = d3.scaleLinear().domain([d3.min(deaths),d3.max(deaths)]).range(["green", "orange"]);
 
     console.log("Ready...")
 
     let iso = "GBR";
+    
+    // REQUEST DATA
+    d3.json('https://raw.githubusercontent.com/cd94/f20dv_lab3/master/custom.geo.json')
+    .then(function(json) {
+        update(json,color,worldData)
+    });
 
     initialise(iso,768,"Vaccinations")
     
 });
+
+function getWorldData(){
+    return worldData
+}
+
+function getColorScale(){
+    return color
+}
+
 
 function initialise(iso, day, category){
 
@@ -66,7 +89,7 @@ function initialise(iso, day, category){
     }
 
     if(category === "Vaccinations"){
-        console.log(totalVaccinated)
+
         updateChart(totalVaccinated, worldData.get(iso)[0].location, iso, category);
     }
     if(category === "Tests"){
@@ -91,10 +114,10 @@ function initialisePie(iso,day){
         day = vaxData.length-1
     }
     
-    console.log(vaxData[day])
+  
     let pieData = []
     pieData.push(vaxData[day].x,vaxData[day].y,vaxData[day].z);
-    console.log(pieData) 
+     
 
     updatePie(vaxData,pieData,worldData.get(iso)[0].location,iso,day);
 }

@@ -35,9 +35,9 @@
     // Append path to the SVG using pie data
     function draw(dataset,country,iso,day){
             // Define color ranges
-        let color =  d3.scaleOrdinal().domain(dataset).range(["YellowGreen", "MediumSeaGreen", "DarkOrange"]);
+        let color =  d3.scaleOrdinal().domain(dataset).range(["YellowGreen", "Green", "Orange"]);
         let keys = ["Partially Vaccinated", "Fullly Vaccinated","Unvaccinated"];
-        let keycolor =  d3.scaleOrdinal().domain(keys).range(["YellowGreen", "MediumSeaGreen", "DarkOrange"]);
+        let keycolor =  d3.scaleOrdinal().domain(keys).range(["YellowGreen", "Green", "Orange"]);
 
         let path = pieSvg.selectAll("path")
         .data(pie(dataset))

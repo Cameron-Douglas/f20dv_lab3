@@ -4,16 +4,7 @@ body{
 }
 
 #selected{
-    fill: green;
-}
-
-#unselected{
-    fill: #aaa;         
-}
-
-.map path {
-    fill: #aaa;
-    stroke: steelblue;
+    fill: darkslateblue;
 }
 
 .map_container{
