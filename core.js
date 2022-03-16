@@ -1,8 +1,6 @@
 let locations = 'https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv';
 
-const dropdownContainer = d3.select("body")
-    .append("div")
-    .attr("id","dropdown-container")
+let geoJSON;
 
 let worldData = new Map();
 
@@ -10,6 +8,8 @@ let totalVaccinated = [];
 let vaxData = [];
 
 let listCountries = [];
+
+let initDay = "max";
 
 var color;
 
@@ -70,10 +70,10 @@ d3.csv(locations, function(data) {
     // REQUEST DATA
     d3.json('https://raw.githubusercontent.com/cd94/f20dv_lab3/master/custom.geo.json')
     .then(function(json) {
-        update(json,color,worldData)
+        geoJSON = json
+        update(json,color,worldData,"cpm","max")
     });
-
-    initialise(iso,768,"Vaccinations")
+    multiCountry(['GBR','IRL'],"Vaccinations", "max", true)
     
 });
 
@@ -86,37 +86,7 @@ function getColorScale(){
 }
 
 
-function initialise(iso, day, category){
-
-    buildVaxData(iso);
-
-    if(initCounter === 0){
-        setupAxes(totalVaccinated, worldData.get(iso)[0].location, category);
-        initCounter++;
-    }
-
-    if(category === "Vaccinations"){
-
-        updateChart(totalVaccinated, worldData.get(iso)[0].location, iso, category);
-    }
-    if(category === "Tests"){
-        buildTestData(iso);
-        updateChart(totalTests, worldData.get(iso)[0].location, iso, category);
-    }
-    if(category === "Hospitalisations"){
-        buildHospitalData(iso);
-        updateChart(totalHospitalisations, worldData.get(iso)[0].location, iso, category);
-    }
-    if(category === "Deaths"){
-        buildDeathData(iso);
-        updateChart(totalDeaths, worldData.get(iso)[0].location, iso, category);
-    }
-
-    initialisePie(iso,day)
-
-}
-
-function initialisePie(iso,day){
+function initialisePie(day){
     if(day === "max"){
         day = vaxData.length-1
     }
@@ -126,16 +96,18 @@ function initialisePie(iso,day){
     pieData.push(vaxData[day].x,vaxData[day].y,vaxData[day].z);
      
 
-    updatePie(vaxData,pieData,worldData.get(iso)[0].location,iso,day);
+    updatePie(worldData,vaxData,pieData,"Selected Region","iso",day,geoJSON);
 }
 
-function multiCountry(list, category){
+function multiCountry(list, category, day, update){
 
     if(list.length !== 0){
       
         listCountries = list;
     }
-
+    if(day != null){
+        initDay = day
+    }
     totalVaccinated = [];
     totalTests = [];
     totalHospitalisations = [];
@@ -147,8 +119,45 @@ function multiCountry(list, category){
     prevValueUV = 0; 
 
     prevValue = 0;
+    var countries = d3.select(".map_container")
+    if(initCounter === 0){
+        setupAxes(totalVaccinated, "Selected Region", category);
+        countries
+            .append("div")
+            .attr("class","countryContainer")
+            .style("border-style","solid")
+            .style("border-radius","12px")
+            .style("border-color","steelblue")
+            .style("padding","10px 10px 10px 10px")
+            .append("text")
+            .text("Selected Countries: ")
+            .style("font-size","18px")
+        initCounter++;
+    }
+    if(update){
+        let arr = [1]
+        countries.selectAll("text")
+            .data(arr)
+            .exit()
+            .remove()
 
-
+        for(let i = 0; i<list.length; i++){
+            if(worldData.get(listCountries[i])!==undefined){
+                let country = worldData.get(list[i])[0].location
+                if(i == list.length - 1){
+                    d3.select(".countryContainer")
+                    .append("text")
+                    .text(country)
+                } else{
+                    d3.select(".countryContainer")
+                    .append("text")
+                    .text(country+ ", ")
+                }
+        }
+            
+        }
+    }
+    
     if(category === "Vaccinations"){
 
         for(let i = 0; i<listCountries.length;i++){
@@ -157,7 +166,9 @@ function multiCountry(list, category){
             }
         // console.log(totalVaccinated)
         }
-        updateChart(totalVaccinated,"Selection","iso",category)
+        updateChart(totalVaccinated,"Selected Region","iso",category)
+        //console.log(vaxData)
+        initialisePie(initDay)
     }
     if(category === "Tests"){
         
@@ -167,7 +178,7 @@ function multiCountry(list, category){
             }
        
         }
-        updateChart(totalTests,"Selection","iso",category)
+        updateChart(totalTests,"Selected Region","iso",category)
     }
     console.log(category)
     if(category === "Hospitalisations"){
@@ -178,7 +189,7 @@ function multiCountry(list, category){
             }
          
         }
-        updateChart(totalHospitalisations,"Selection","iso",category)
+        updateChart(totalHospitalisations,"Selected Region","iso",category)
     }
     if(category === "Deaths"){
         
@@ -188,7 +199,7 @@ function multiCountry(list, category){
             }
          
         }
-        updateChart(totalDeaths,"Selection","iso",category)
+        updateChart(totalDeaths,"Selected Region","iso",category)
     }
 }
 
@@ -254,7 +265,7 @@ function buildVaxData(iso){
             totalVaccinated[j].y += totalvax;
             vaxData[j].x += totalvax;
             vaxData[j].y += fullvax;
-            vaxData[j].y += unvax;
+            vaxData[j].z += unvax;
 
             prevValuePV = totalvax;
             prevValuePFV = fullvax;
@@ -377,8 +388,3 @@ function buildDeathData(iso){
             }
         }
 }
-
-
-
-
-

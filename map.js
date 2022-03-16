@@ -1,6 +1,6 @@
 // Modified from code example: https://www.d3indepth.com/geographic/
 
-const width = 750;
+const width = 662;
 const height = 475;
 
 const Data = getWorldData();
@@ -31,8 +31,8 @@ d3.select("body")
 
 
 let projection = d3.geoMercator()
-	.scale(110)
-	.translate([375, 325])
+	.scale(105)
+	.translate([330, 325])
 	
 
 let geoGenerator = d3.geoPath()
@@ -68,14 +68,12 @@ let geoGenerator = d3.geoPath()
 // });
 
 
-
-
 function update(geojson,color,data) {
    
 	var u = d3.select('.map')
 		.selectAll('path')
 		.data(geojson.features);
-
+    
    
 	u.enter()
 		.append('path')
@@ -90,74 +88,77 @@ function update(geojson,color,data) {
                 thisColor = "#aaa"
             
             } else{
-                let index = data.get(iso).length-1
+                let index = data.get(iso).length - 1; 
                 let tdpm = data.get(iso)[index].total_cases_per_million;
                 thisColor = color(tdpm)
+                
             }
             return thisColor
             })
         .attr("stroke","steelblue")
-        .on('click', function(event,d,i){
+        // .on('click', function(event,d,i){
 
-            // https://stackoverflow.com/questions/18005600/setting-a-color-for-click-event-on-a-d3-map
+        //     // https://stackoverflow.com/questions/18005600/setting-a-color-for-click-event-on-a-d3-map
 
-            d3.select(".selected")  
-                .attr("class","unselected");
+        //     d3.select(".selected")  
+        //         .attr("class","unselected");
 
-            d3.select(this)
-                .attr("class","selected");
+        //     d3.select(this)
+        //         .attr("class","selected");
             
-            if(d.properties.iso_a3 === undefined || data.get(d.properties.iso_a3) === undefined){
+        //     if(d.properties.iso_a3 === undefined || data.get(d.properties.iso_a3) === undefined){
 
-            } else{
-                selected = d.properties.name_long 
-                selectedISO = d.properties.iso_a3
-                initialise(selectedISO,"max","Vaccinations");
+        //     } else{
+        //         selected = d.properties.name_long 
+        //         selectedISO = d.properties.iso_a3
+        //         initialise(selectedISO,"max","Vaccinations");
 
-                d3.select(".shape")
-                .property("checked", function(d, i) { 
-                    return (i===j); 
-                });
-            }
-        })
-		.on('mouseover', function(event,d,i){
-            let centroid = geoGenerator.centroid(d);
-            let tmp = [];
+        //         d3.select(".shape")
+        //         .property("checked", function(d, i) { 
+        //             return (i===j); 
+        //         });
+        //     }
+        // })
+		// .on('mouseover', function(event,d,i){
+        //     let centroid = geoGenerator.centroid(d);
+        //     let tmp = [];
         
-            d3.select(".country_label")
-                .data(tmp)
-                .exit()
-                .remove()
+        //     d3.select(".country_label")
+        //         .data(tmp)
+        //         .exit()
+        //         .remove()
 
 
-            if(d.properties.iso_a3 === undefined || data.get(d.properties.iso_a3) === undefined){
-                d3.select("svg").append("text")
-                    .attr("class","country_label")
-                    .text(d.properties.name_long + ": No Data")
-            } else{
-                d3.select("svg").append("text")
-                .attr("class","country_label")
-                .text(d.properties.name_long)
-            }
+        //     if(d.properties.iso_a3 === undefined || data.get(d.properties.iso_a3) === undefined){
+        //         d3.select("svg").append("text")
+        //             .attr("class","country_label")
+        //             .text(d.properties.name_long + ": No Data")
+        //     } else{
+        //         d3.select("svg").append("text")
+        //         .attr("class","country_label")
+        //         .text(d.properties.name_long)
+        //     }
 
-            d3.selectAll(".country_label")
-            .attr("x",width/2)
-                .attr("y",25)
-                .style("font-size","19px")
-                .style("text-decoration","underline")
-        })
-        .on('mouseleave', function(event,d,i){
+        //     d3.selectAll(".country_label")
+        //     .attr("x",width/2)
+        //         .attr("y",25)
+        //         .style("font-size","19px")
+        //         .style("text-decoration","underline")
+        // })
+        // .on('mouseleave', function(event,d,i){
             
-            let tmp = [];
+        //     let tmp = [];
             
-            d3.select(".country_label")
-                .data(tmp)
-                .exit()
-                .remove()
-        })
+        //     d3.select(".country_label")
+        //         .data(tmp)
+        //         .exit()
+        //         .remove()
+        // })
         ;
-        d3.select(".GBR")
-            .attr("id","selected");
+        d3.select("#GBR")
+            .attr("class","selected");
+        d3.select("#IRL")
+            .attr("class","selected");
     
         
     var brush = d3.select(".map_svg")
@@ -172,7 +173,7 @@ function update(geojson,color,data) {
                 .selectAll("path")
                 .attr("class", function(d){return isBrushed(extent,geoGenerator.centroid(d),d.properties.iso_a3)})
             
-            multiCountry(countryList,"Vaccinations")
+            multiCountry(countryList,"Vaccinations","max",true)
             countryList = [];
         }
     }));

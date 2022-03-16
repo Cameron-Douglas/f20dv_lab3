@@ -16,6 +16,12 @@
 
     let currCountry;
 
+    let colorPart = d3.scaleLinear();
+    let colorFull = d3.scaleLinear(); 
+    let colorUn = d3.scaleLinear();
+
+    let updateJSON;
+
     // Initialise pie let#iable
     let pie = d3.pie()
     .sort(null);
@@ -117,6 +123,7 @@
                     
                 }
                 updateChart(vaccinated, currCountry, iso, "Partialy Vaccinated");
+                // update(updateJSON,colorPart,fullData,"part",day);
                 vaccinated = [];
        
             }
@@ -127,6 +134,7 @@
                     
                 }
                 updateChart(fullVax, currCountry, iso, "Fully Vaccinated");
+                // update(updateJSON,colorFull,fullData,"full",day);
                 fullVax = [];
             }
             if(index === 2){
@@ -136,6 +144,7 @@
                     
                 }
                 updateChart(unVax, currCountry, iso, "Un-Vaccinated");
+                // update(updateJSON,colorUn,fullData,"un",day);
                 unVax = [];
             }
           
@@ -174,7 +183,9 @@
     }
 
     // Update function called on button press
-    function updatePie(fullDataset,dataset,country,iso,day){
+    function updatePie(worldData,fullDataset,dataset,country,iso,day,json){
+
+        updateJSON = json
 
         updateCountry(country);
         population = 0;
@@ -184,6 +195,20 @@
         }
 
         fullData = fullDataset
+
+        let part = []
+        let full = []
+        let un = []
+
+        // worldData.forEach(function(value){
+        //     console.log(value)
+        //     part.push(value[value.length-1].people_vaccinated)
+        //     full.push(value[value.length-1].people_fully_vaccinated)
+        //     un.push(value[value.length-1].population - value[value.length-1].people_vaccinated)
+        // })
+        // colorPart = d3.scaleLinear().domain([d3.min(part),d3.max(part)]).range(["green", "orange"]);
+        // colorFull = d3.scaleLinear().domain([d3.min(full),d3.max(full)]).range(["green", "orange"]);
+        // colorUn = d3.scaleLinear().domain([d3.min(un),d3.max(un)]).range(["green", "orange"]);
     
         if(counter == 0){
             draw(dataset,currCountry,day)

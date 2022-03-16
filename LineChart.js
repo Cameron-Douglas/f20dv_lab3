@@ -1,4 +1,4 @@
-const xSize = 750; const ySize = 600;
+const xSize = 700; const ySize = 600;
 const margin = 150;
 const xMax = xSize - margin*2;
 const yMax = ySize - margin*2;
@@ -216,7 +216,7 @@ function updateChart(data, country, iso, category){
                 .style("opacity",0)
         })
         .on("click",function(event,d,i){
-            initialisePie(iso,d.x); // TODO -- Potential Change Category?
+            multiCountry([],category,d.x,false); // TODO -- Potential Change Category?
         });
 
         svg.append("text")
@@ -235,7 +235,7 @@ function updateChart(data, country, iso, category){
         .attr("x", 0)
         .attr("y",-50)
         .attr("class","chartLabel")
-        .text(country + " Covid " + category + " Over Time")
+        .text("Covid " + category + " in " + country + " Over Time")
         .style("font-size","19px")
 
     svg.append("text")

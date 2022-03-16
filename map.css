@@ -9,12 +9,12 @@ body{
 
 .map_container{
     
-    width: 750px;
+    width: 662px;
     float:left;
    
 }
 .chart_container{
-    width: 750px;
+    width: 840px;
     float:right;
     
 }
