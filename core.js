@@ -9,6 +9,8 @@ let worldData = new Map();
 let totalVaccinated = [];
 let vaxData = [];
 
+let listCountries = [];
+
 var color;
 
 let initCounter = 0;
@@ -120,6 +122,15 @@ function initialisePie(iso,day){
      
 
     updatePie(vaxData,pieData,worldData.get(iso)[0].location,iso,day);
+}
+
+function multiCountry(list){
+    listCountries.push(list)
+    console.log(listCountries[0])
+}
+
+function buildMultiData(list){
+    
 }
 
 function buildVaxData(iso){

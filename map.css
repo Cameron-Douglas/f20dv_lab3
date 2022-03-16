@@ -3,7 +3,7 @@ body{
     color:darkslategrey;
 }
 
-#selected{
+.selected{
     fill: darkslateblue;
 }
 
@@ -14,7 +14,7 @@ body{
    
 }
 .chart_container{
-    width: 1200px;
+    width: 750px;
     float:right;
     
 }
@@ -23,8 +23,16 @@ body{
     
 }  
 
+.selectedCentroid{
+    fill:purple;
+}
+
 form{
     float:left;
     vertical-align: middle;
+}
+
+h1{
+    text-align: center;
 }
     

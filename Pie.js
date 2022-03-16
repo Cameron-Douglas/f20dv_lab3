@@ -6,12 +6,15 @@
 
     let counter = 0;
 
+    let population = 0;
 
     let fullData = [];
 
     let vaccinated = [];
     let fullVax = [];
     let unVax = [];
+
+    let currCountry;
 
     // Initialise pie let#iable
     let pie = d3.pie()
@@ -32,8 +35,14 @@
     .append("g")
     .attr("transform", "translate(" + pieWidth / 2 + "," + pieHeight / 2 + ")");
 
+    function updateCountry(country){
+        currCountry = country;
+    }
+
     // Append path to the SVG using pie data
     function draw(dataset,country,iso,day){
+
+        updateCountry(country)
             // Define color ranges
         let color =  d3.scaleOrdinal().domain(dataset).range(["YellowGreen", "Green", "Orange"]);
         let keys = ["Partially Vaccinated", "Fullly Vaccinated","Unvaccinated"];
@@ -46,6 +55,8 @@
         .attr("d", arc)
         .on("mouseover",function(event,d,i){
 
+            console.log(d.index)
+
             d3.select(this)
                 .transition()
                 .ease(d3.easeBounce)
@@ -55,14 +66,29 @@
                 .attr("stroke","#ffff")
                 .attr("stroke-width","2px");
 
-            pieSvg.append("text")
+            pieSvg
+                .append("text")
                 .attr("x", 95)
                 .attr("y", -70)
                 .attr("class","pie_label")
-                .text(d.data)
+                .text(function(){
+                    let percentage = Math.round(d.data/population*100);
+                    return percentage+"%"})
                 .style("font-size", 18)
                 .style("font-weight","bold")
-                .style("text-decoration","underline")
+                .attr("fill",function(){
+                    let thisColor = "#aaa"
+                    if(d.index === 0){
+                        thisColor = "YellowGreen"
+                    }
+                    if(d.index === 1){
+                        thisColor = "Green"
+                    }
+                    if(d.index === 2){
+                        thisColor = "Orange"
+                    }
+                    return thisColor
+                })
             
          })
         .on("mouseleave",function(event,d,i){
@@ -90,7 +116,7 @@
                     vaccinated.push({x:i, y:fullData[i].x})
                     
                 }
-                updateChart(vaccinated, country, iso, "Partialy Vaccinated");
+                updateChart(vaccinated, currCountry, iso, "Partialy Vaccinated");
                 vaccinated = [];
        
             }
@@ -100,7 +126,7 @@
                     fullVax.push({x:i, y:fullData[i].y})
                     
                 }
-                updateChart(fullVax, country, iso, "Fully Vaccinated");
+                updateChart(fullVax, currCountry, iso, "Fully Vaccinated");
                 fullVax = [];
             }
             if(index === 2){
@@ -109,7 +135,7 @@
                     unVax.push({x:i, y:fullData[i].z})
                     
                 }
-                updateChart(unVax, country, iso, "Un-Vaccinated");
+                updateChart(unVax, currCountry, iso, "Un-Vaccinated");
                 unVax = [];
             }
           
@@ -150,10 +176,17 @@
     // Update function called on button press
     function updatePie(fullDataset,dataset,country,iso,day){
 
+        updateCountry(country);
+        population = 0;
+
+        for(let i = 0;i<dataset.length;i++){
+            population += dataset[i];
+        }
+
         fullData = fullDataset
     
         if(counter == 0){
-            draw(dataset,country,day)
+            draw(dataset,currCountry,day)
             let tmp = [];
 
             let v = pieSvg.selectAll(".pie_header")
@@ -164,7 +197,7 @@
             pieSvg.append("text")
                 .attr("x",-275)
                 .attr("y",-120)
-                .text("Vaccination proportion in " + country + " on day # " + day)
+                .text("Vaccination proportion in " + currCountry + " on day # " + day)
                 .attr("class","pie_header")
                 .style("font-size","19px");
         }
@@ -196,7 +229,7 @@
             pieSvg.append("text")
                 .attr("x",-275)
                 .attr("y",-120)
-                .text("Vaccination proportion in " + country + " on day # " + day)
+                .text("Vaccination proportion in " + currCountry + " on day # " + day)
                 .attr("class","pie_header")
                 .style("font-size","19px");
             }

@@ -103,7 +103,7 @@ function setupAxes(data, country, category){
 
 }
 
-function updateAxes(data,country,category){
+function updateAxes(data){
     
     xExtent = d3.extent( data, d=>{ return d.x } );
     yExtent = d3.extent( data, d=>{ return d.y } );
@@ -138,9 +138,8 @@ function updateAxes(data,country,category){
 }
 
 function updateChart(data, country, iso, category){
-     
-    let tmp = [];
     
+    let tmp = [];
     
     svg.selectAll(".marker")
         .data(tmp)
