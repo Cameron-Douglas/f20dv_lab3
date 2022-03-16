@@ -115,6 +115,8 @@
         })
         .on("click",function(event,d,i){
             let index = d3.select(this)._groups[0][0].__data__.index
+
+            setupOptions()
             
             if(index === 0){
                 for(let i = 0; i<fullData.length; i++){
