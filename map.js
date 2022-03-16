@@ -174,6 +174,7 @@ function update(geojson,color,data) {
                 .attr("class", function(d){return isBrushed(extent,geoGenerator.centroid(d),d.properties.iso_a3)})
             
             multiCountry(countryList,"Vaccinations","max",true)
+            setupOptions()
             countryList = [];
         }
     }));

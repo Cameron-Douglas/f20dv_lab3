@@ -28,34 +28,46 @@ const svg = d3.select("body")
 .append("g")
 .attr("transform","translate(" + margin + "," + 75 + ")");
 
-var form = d3.select(".chart_container").append("form");
+function setupOptions(){
 
-inputs = form.selectAll("label")
-    .data(radioOptions)
-    .enter()
-    .append("div")
-        .attr("class","radio")
-        .append("text")
-        .text(function(d) {return d;})
-        .append("input")
-        .attr("type","radio")
-        .attr("class","shape")
-        .attr("name","mode")
-        .property("checked", function(d, i) { 
-            return (i===j); 
-        })
-        .attr("value", function(d, i) {return i;})
+    let arr = []
+
+    d3.selectAll("form")
+        .data(arr)
+        .exit()
+        .remove()
+
+    var form = d3.select(".chart_container").append("form");
+
+    inputs = form.selectAll("label")
+        .data(radioOptions)
+        .enter()
+        .append("div")
+            .attr("class","radio")
+            .append("text")
+            .text(function(d) {return d;})
+            .append("input")
+            .attr("type","radio")
+            .attr("class","shape")
+            .attr("name","mode")
+            .property("checked", function(d, i) { 
+                return (i===j); 
+            })
+            .attr("value", function(d, i) {return i;})
 
 
-        let formSelection = d3.select("form");
-        formSelection.on("change",function(event){
-            change(event.target.__data__)});
-        
-        function change(d){
-            multiCountry([],d)
-        }
+            let formSelection = d3.select("form");
+            formSelection.on("change",function(event){
+                change(event.target.__data__)});
+            
+            function change(d){
+                multiCountry([],d)
+            }
+    }
 
 function setupAxes(data, country, category){
+
+    setupOptions()
 
     /* Get the 'limits' of the data - the full extent (mins and max)
     so the plotted data fits perfectly */
