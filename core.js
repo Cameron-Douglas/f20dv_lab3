@@ -176,32 +176,38 @@ function multiCountry(list, category, day, update){
         
         for(let i = 0; i<listCountries.length;i++){
             if(worldData.get(listCountries[i])!==undefined){
+                buildVaxData(listCountries[i])
                 buildTestData(listCountries[i])
             }
        
         }
         updateChart(totalTests,"Selected Region","iso",category)
+        initialisePie(initDay)
     }
     console.log(category)
     if(category === "Hospitalisations"){
         
         for(let i = 0; i<listCountries.length;i++){
             if(worldData.get(listCountries[i])!==undefined){
+                buildVaxData(listCountries[i])
                 buildHospitalData(listCountries[i])
             }
          
         }
         updateChart(totalHospitalisations,"Selected Region","iso",category)
+        initialisePie(initDay)
     }
     if(category === "Deaths"){
         
         for(let i = 0; i<listCountries.length;i++){
             if(worldData.get(listCountries[i])!==undefined){
+                buildVaxData(listCountries[i])
                 buildDeathData(listCountries[i])
             }
          
         }
         updateChart(totalDeaths,"Selected Region","iso",category)
+        initialisePie(initDay)
     }
 }
 
@@ -246,7 +252,7 @@ function buildVaxData(iso){
                 totalvax = prevValuePV;
                 fullvax = prevValuePFV;
                 unvax = prevValueUV;
-                
+
                 totalVaccinated[j].y += totalvax;
 
                 vaxData[j].x += totalvax;
