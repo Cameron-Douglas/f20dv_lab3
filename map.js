@@ -166,9 +166,15 @@ function update(geojson,color,data) {
     .on("end",function(event){
         //console.log(event.selection)
         extent = event.selection
-        d3.select(".map")
-            .selectAll("path")
-            .attr("class", function(d){return isBrushed(extent,geoGenerator.centroid(d),d.properties.iso_a3)})
+        //console.log(extent)
+        if(extent != null){
+            d3.select(".map")
+                .selectAll("path")
+                .attr("class", function(d){return isBrushed(extent,geoGenerator.centroid(d),d.properties.iso_a3)})
+            
+            multiCountry(countryList,"Vaccinations")
+            countryList = [];
+        }
     }));
 } 
 
@@ -186,8 +192,7 @@ function isBrushed(brushArea,centroid,iso){
 
     if(x0 <= x2 && x2 <= x1 && y0 <= y2 && y2 <= y1){
         toClass = "selected";
-        countryList.push(iso);
-        multiCountry(countryList)
+        countryList.push(iso)
         
     } else{
         toClass = "unselected";

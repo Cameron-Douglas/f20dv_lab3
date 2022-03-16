@@ -52,7 +52,7 @@ inputs = form.selectAll("label")
             change(event.target.__data__)});
         
         function change(d){
-            initialise(selectedISO,"max",d)
+            multiCountry([],d)
         }
 
 function setupAxes(data, country, category){
