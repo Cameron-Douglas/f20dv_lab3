@@ -87,16 +87,18 @@ function getColorScale(){
 
 
 function initialisePie(day){
+    let currDay = day
     if(day === "max"){
-        day = vaxData.length-1
+       currDay = vaxData.length-1
     }
     
   
     let pieData = []
-    pieData.push(vaxData[day].x,vaxData[day].y,vaxData[day].z);
-     
+    pieData.push(vaxData[currDay].x,vaxData[currDay].y,vaxData[currDay].z);
+    
+    //console.log(vaxData[currDay])
 
-    updatePie(worldData,vaxData,pieData,"Selected Region","iso",day,geoJSON);
+    updatePie(worldData,vaxData,pieData,"Selected Region","iso",currDay,geoJSON);
 }
 
 function multiCountry(list, category, day, update){
@@ -167,7 +169,7 @@ function multiCountry(list, category, day, update){
         // console.log(totalVaccinated)
         }
         updateChart(totalVaccinated,"Selected Region","iso",category)
-        //console.log(vaxData)
+        console.log(vaxData)
         initialisePie(initDay)
     }
     if(category === "Tests"){
@@ -226,8 +228,7 @@ function buildVaxData(iso){
             }  
 
             totalVaccinated.push({x:i,y:totalvax});
-            vaxData.push({x:totalvax,y:fullvax,z:unvax});
-            
+            vaxData.push({x:totalvax,y:fullvax,z:unvax});            
 
             prevValuePV = totalvax;
             prevValuePFV = fullvax;
@@ -238,11 +239,19 @@ function buildVaxData(iso){
         prevValuePV = 0;
         prevValuePFV = 0;
         prevValueUV = 0; 
+
         for(let j = 0; j<totalVaccinated.length;j++){
             //console.log(worldData.get(iso) == undefined)
             if(worldData.get(iso)[j] === undefined){
                 totalvax = prevValuePV;
+                fullvax = prevValuePFV;
+                unvax = prevValueUV;
+                
                 totalVaccinated[j].y += totalvax;
+
+                vaxData[j].x += totalvax;
+                vaxData[j].y += fullvax;
+                vaxData[j].z += unvax;
             } else{
             let totalvax = parseInt(worldData.get(iso)[j].people_vaccinated);
             let fullvax = parseInt(worldData.get(iso)[j].people_fully_vaccinated)
@@ -258,11 +267,10 @@ function buildVaxData(iso){
     
             if(isNaN(unvax)){
                 unvax = prevValueUV;
-            }  
-            //  console.log(totalVaccinated[j].y, totalvax)
-            
+            }           
 
             totalVaccinated[j].y += totalvax;
+
             vaxData[j].x += totalvax;
             vaxData[j].y += fullvax;
             vaxData[j].z += unvax;
@@ -270,7 +278,6 @@ function buildVaxData(iso){
             prevValuePV = totalvax;
             prevValuePFV = fullvax;
             prevValueUV = unvax;
-        
             } 
         }
     }

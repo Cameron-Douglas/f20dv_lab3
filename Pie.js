@@ -1,6 +1,6 @@
 
 // Initialise SVG properties
-    let pieWidth = 750,
+    let pieWidth = 662,
         pieHeight = 300,
         radius = Math.min(pieWidth, pieHeight) / 2;
 
@@ -195,6 +195,8 @@
         }
 
         fullData = fullDataset
+
+        console.log(fullData)
 
         let part = []
         let full = []
