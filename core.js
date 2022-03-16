@@ -15,6 +15,7 @@ var color;
 
 let initCounter = 0;
 
+let prevValue = 0;
 let prevValuePV = 0;
 let prevValuePFV = 0;
 let prevValueUV = 0;
@@ -129,25 +130,65 @@ function initialisePie(iso,day){
 }
 
 function multiCountry(list, category){
-    if(list !== []){
+
+    if(list.length !== 0){
+      
         listCountries = list;
     }
-    console.log(category)
-    totalVaccinated = [];
-    vaxData = [];
 
+    totalVaccinated = [];
+    totalTests = [];
+    totalHospitalisations = [];
+    totalDeaths = [];
+    vaxData = [];
+    
     prevValuePV = 0;
     prevValuePFV = 0;
     prevValueUV = 0; 
 
+    prevValue = 0;
+
+
     if(category === "Vaccinations"){
-    for(let i = 0; i<listCountries.length;i++){
-        if(worldData.get(listCountries[i])!==undefined){
-            buildVaxData(listCountries[i])
+
+        for(let i = 0; i<listCountries.length;i++){
+            if(worldData.get(listCountries[i])!==undefined){
+                buildVaxData(listCountries[i])
+            }
+        // console.log(totalVaccinated)
         }
-       // console.log(totalVaccinated)
+        updateChart(totalVaccinated,"Selection","iso",category)
     }
-    updateChart(totalVaccinated,"Selection","iso",category)
+    if(category === "Tests"){
+        
+        for(let i = 0; i<listCountries.length;i++){
+            if(worldData.get(listCountries[i])!==undefined){
+                buildTestData(listCountries[i])
+            }
+       
+        }
+        updateChart(totalTests,"Selection","iso",category)
+    }
+    console.log(category)
+    if(category === "Hospitalisations"){
+        
+        for(let i = 0; i<listCountries.length;i++){
+            if(worldData.get(listCountries[i])!==undefined){
+                buildHospitalData(listCountries[i])
+            }
+         
+        }
+        updateChart(totalHospitalisations,"Selection","iso",category)
+    }
+    if(category === "Deaths"){
+        
+        for(let i = 0; i<listCountries.length;i++){
+            if(worldData.get(listCountries[i])!==undefined){
+                buildDeathData(listCountries[i])
+            }
+         
+        }
+        updateChart(totalDeaths,"Selection","iso",category)
     }
 }
 
@@ -225,55 +266,116 @@ function buildVaxData(iso){
 }
 
 function buildTestData(iso){
-        let prevValue = 0;
+
+    if(totalTests.length === 0){
         // Building dataset for number of people vaccinated for line chart
-        for(let i = 0; i<worldData.get(iso).length;i++){
+            for(let i = 0; i<worldData.get(iso).length;i++){
     
-            let totaltest = parseInt(worldData.get(iso)[i].total_tests);
-            
-            if(isNaN(totaltest)){
-                totaltest = prevValue;
-            }  
-            //console.log(totaltest)
-            totalTests.push({x:i,y:totaltest});
-            prevValue = totaltest;
-        } 
+                let totaltest = parseInt(worldData.get(iso)[i].total_tests);
+                
+                if(isNaN(totaltest)){
+                    totaltest = prevValue;
+                }  
+                totalTests.push({x:i,y:totaltest});
+    
+                prevValue = totaltest;
+            } 
+        } else{
+            prevValue = 0; 
+            for(let j = 0; j<totalTests.length;j++){
+                //console.log(worldData.get(iso) == undefined)
+                if(worldData.get(iso)[j] === undefined){
+                    totaltest = prevValue;
+                    totalTests[j].y += totaltest;
+                } else{
+                let totaltest = parseInt(worldData.get(iso)[j].total_tests);
+                
+                if(isNaN(totaltest)){
+                    totaltest = prevValue;
+                } 
+                
+                totalTests[j].y += totaltest;
+    
+                prevValue = totaltest;
+                } 
+            }
+        }
     } 
  
 
 
 function buildHospitalData(iso){
-    totalHospitalisations = [];
-    let prevValue = 0;
-    // Building dataset for number of people vaccinated for line chart
-    for(let i = 0; i<worldData.get(iso).length;i++){
 
-        let totalhosp = parseInt(worldData.get(iso)[i].hosp_patients);
-        
-        if(isNaN(totalhosp)){
-            totalhosp = prevValue;
-        }  
-        totalHospitalisations.push({x:i,y:totalhosp});
-        prevValue = totalhosp;
-      
-    } 
+    if(totalHospitalisations.length === 0){
+        // Building dataset for number of people vaccinated for line chart
+            for(let i = 0; i<worldData.get(iso).length;i++){
+    
+                let totalhosp = parseInt(worldData.get(iso)[i].hosp_patients);
+                
+                if(isNaN(totalhosp)){
+                    totalhosp = prevValue;
+                }  
+                totalHospitalisations.push({x:i,y:totalhosp});
+    
+                prevValue = totalhosp;
+            } 
+        } else{
+            prevValue = 0; 
+            for(let j = 0; j<totalHospitalisations.length;j++){
+                //console.log(worldData.get(iso) == undefined)
+                if(worldData.get(iso)[j] === undefined){
+                    totalhosp = prevValue;
+                    totalHospitalisations[j].y += totalhosp;
+                } else{
+                let totalhosp = parseInt(worldData.get(iso)[j].hosp_patients);
+                
+                if(isNaN(totalhosp)){
+                    totalhosp = prevValue;
+                } 
+                
+                totalHospitalisations[j].y += totalhosp;
+    
+                prevValue = totalhosp;
+                } 
+            }
+        }
 }
 
 function buildDeathData(iso){
-    totalDeaths = [];
-    let prevValue = 0;
-    // Building dataset for number of people vaccinated for line chart
-    for(let i = 0; i<worldData.get(iso).length;i++){
 
-        let totaldeath = parseInt(worldData.get(iso)[i].total_deaths);
-        
-        if(isNaN(totaldeath)){
-            totaldeath = prevValue;
-        }  
-        totalDeaths.push({x:i,y:totaldeath});
-        prevValue = totaldeath;
-      
-    } 
+    if(totalDeaths.length === 0){
+        // Building dataset for number of people vaccinated for line chart
+            for(let i = 0; i<worldData.get(iso).length;i++){
+    
+                let totaldeath = parseInt(worldData.get(iso)[i].total_deaths);
+                
+                if(isNaN(totaldeath)){
+                    totaldeath = prevValue;
+                }  
+                totalDeaths.push({x:i,y:totaldeath});
+    
+                prevValue = totaldeath;
+            } 
+        } else{
+            prevValue = 0; 
+            for(let j = 0; j<totalDeaths.length;j++){
+                //console.log(worldData.get(iso) == undefined)
+                if(worldData.get(iso)[j] === undefined){
+                    totaldeath = prevValue;
+                    totalDeaths[j].y += totaldeath;
+                } else{
+                let totaldeath = parseInt(worldData.get(iso)[j].total_deaths);
+                
+                if(isNaN(totaldeath)){
+                    totaldeath = prevValue;
+                } 
+                
+                totalDeaths[j].y += totaldeath;
+    
+                prevValue = totaldeath;
+                } 
+            }
+        }
 }
 
 
