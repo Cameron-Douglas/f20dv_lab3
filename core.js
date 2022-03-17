@@ -1,3 +1,5 @@
+// DECLARING GLOBAL VARIABLES
+
 let locations = 'https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv';
 
 let geoJSON;
@@ -33,6 +35,7 @@ let fullScatterData = [];
 
 console.log("Building Data...")
 
+// Load in COVID data from git hub
 d3.csv(locations, function(data) {
 	return data;
 
@@ -43,6 +46,7 @@ d3.csv(locations, function(data) {
     let countryData = [];
     let totalData = [];
 
+    // Set an inital ISO code
     let isoCode = "AFG";
 
     // Populating worldData Map
@@ -59,13 +63,12 @@ d3.csv(locations, function(data) {
         
     }
 
-    let deaths = [];
+    let cases = [];
     let excessMort = [];
   
-    // worldData.forEach((value,key)=>locs.push(key));
-    
+    // For each key value pair in the map, build cases data for color scale and scatter data for scatter plot axes  
     worldData.forEach(function(value,key){
-        deaths.push(value[value.length-1].total_cases_per_million)
+        cases.push(value[value.length-1].total_cases_per_million)
         buildScatterData(key,"full")
     })
 
@@ -73,20 +76,23 @@ d3.csv(locations, function(data) {
         excessMort.push(fullScatterData[i].y);
     }
 
-    color = d3.scaleLinear().domain([d3.min(deaths),d3.max(deaths)]).range(["green", "orange"]);
+    // Create color scales for the inital map and for the scatter plot
+    color = d3.scaleLinear().domain([d3.min(cases),d3.max(cases)]).range(["green", "orange"]);
     scatterColor = d3.scaleLinear().domain([d3.min(excessMort),d3.max(excessMort)]).range(["yellowGreen", "orange"]);
 
 
     console.log("Ready...")
 
-    let iso = "GBR";
     
-    // REQUEST DATA
+    // Load GEOJSON data for the map
     d3.json('https://raw.githubusercontent.com/cd94/f20dv_lab3/master/custom.geo.json')
     .then(function(json) {
         geoJSON = json
+        
+        // Call update to draw the map with the GEOJSON data
         update(geoJSON,color,worldData,"cpm","max")
 
+        // Add button to reset the colors of the map
         d3.select(".map_container")
             .append("div")
             .attr("class","color_container") 
@@ -110,52 +116,38 @@ d3.csv(locations, function(data) {
             .text("   Colored By: Cases Per Million") 
 
     });
-    // worldData.forEach(function(value,key){
-        
-    // })
 
- 
-
+    // Initialise the graphs and datasets 
     multiCountry(['GBR','IRL'],"Vaccinations", "max", true)
     
 });
 
-function getWorldData(){
-    return worldData
-}
-
-function getColorScale(){
-    return color
-}
-
-
+// Initialise the pie chart with a day
 function initialisePie(day){
     let currDay = day
     if(day === "max"){
        currDay = vaxData.length-1
     }
     
-  
-    let pieData = []
-    console.log(vaxData)
+    let pieData = [];
     pieData.push(vaxData[currDay].x,vaxData[currDay].y);
 
-    console.log(pieData)
-    
-    //console.log(vaxData[currDay])
-
-    updatePie(worldData,vaxData,pieData,"Selected Region","iso",currDay);
+    // Transition the pie chart with new data
+    updatePie(worldData,vaxData,pieData,"Selected Region",currDay);
 }
 
+// Build data
 function multiCountry(list, category, day, update, color){
 
     if(list.length !== 0){
-      
         listCountries = list;
     }
     if(day != null){
         initDay = day
     }
+
+    // Set varaibles to be 0 or empty, ready for values to be added
+
     totalVaccinated = [];
     totalTests = [];
     totalHospitalisations = [];
@@ -168,10 +160,12 @@ function multiCountry(list, category, day, update, color){
     prevValueUV = 0; 
 
     prevValue = 0;
+
     var countries = d3.select(".map_container")
 
+    // If initialising, setup the axes for the plots and the div for the list of countries selected 
     if(initCounter === 0){
-        setupAxes(totalVaccinated, "Selected Region", category);
+        setupAxes(totalVaccinated);
         setupScatterAxes(fullScatterData)
 
         countries
@@ -186,6 +180,8 @@ function multiCountry(list, category, day, update, color){
             .style("font-size","18px")
         initCounter++;
     }
+
+    // If an update to the list of countries has occured, update the displayed list 
     if(update){
         let arr = [1]
         countries.selectAll("text")
@@ -210,6 +206,7 @@ function multiCountry(list, category, day, update, color){
         }
     }
 
+    // Display how the map is currently being colored
     d3.select(".color_container")
                     .selectAll("text")
                     .remove()
@@ -219,6 +216,8 @@ function multiCountry(list, category, day, update, color){
             .style("font-size","18px")
             .text("   Colored By: Cases Per Million") 
     
+    /*BUILD THE APPROPRIATE DATASETS FROM THE LIST OF COUNTRIES USING THE HELPER FUNCTIONS DEFINED BELOW */
+
     if(category === "Vaccinations"){
 
         for(let i = 0; i<listCountries.length;i++){
@@ -227,7 +226,7 @@ function multiCountry(list, category, day, update, color){
             }
         // console.log(totalVaccinated)
         }
-        updateChart(totalVaccinated,"Selected Region","iso",category,color,worldData)
+        updateChart(totalVaccinated,"Selected Region",category,color,worldData)
         initialisePie(initDay)
     }
 
@@ -251,7 +250,7 @@ function multiCountry(list, category, day, update, color){
             }
        
         }
-        updateChart(totalTests,"Selected Region","iso",category)
+        updateChart(totalTests,"Selected Region",category)
         initialisePie(initDay)
     }
     console.log(category)
@@ -264,7 +263,7 @@ function multiCountry(list, category, day, update, color){
             }
          
         }
-        updateChart(totalHospitalisations,"Selected Region","iso",category)
+        updateChart(totalHospitalisations,"Selected Region",category)
         initialisePie(initDay)
     }
     if(category === "Deaths"){
@@ -276,9 +275,11 @@ function multiCountry(list, category, day, update, color){
             }
          
         }
-        updateChart(totalDeaths,"Selected Region","iso",category)
+        updateChart(totalDeaths,"Selected Region",category)
         initialisePie(initDay)
     }
+
+    // Build the scatter data and call scatter
     for(let i = 0; i<listCountries.length;i++){
         if(worldData.get(listCountries[i])!==undefined){
             buildScatterData(listCountries[i],"part")
@@ -291,6 +292,15 @@ function multiCountry(list, category, day, update, color){
 
     
 }
+
+/*
+ HELPER FUNCTIONS TO BUILD THE DATA.
+
+ Functions take in one iso at a time, if it is the first call, append all of the values to the appropriate dataset
+ else, loop over and add the values from the worldData map to the values already in the dataset to return a 
+ dataset with a running total.
+*/
+
 
 function buildVaxData(iso){
 
@@ -331,27 +341,22 @@ function buildVaxData(iso){
         prevValueUV = 0; 
 
         for(let j = 0; j<totalVaccinated.length;j++){
-            //console.log(worldData.get(iso) == undefined)
+
             if(worldData.get(iso)[j] === undefined){
                 totalvax = prevValuePV;
-                //fullvax = prevValuePFV;
                 unvax = prevValueUV;
 
                 totalVaccinated[j].y += totalvax;
 
                 vaxData[j].x += totalvax;
-                //vaxData[j].y += fullvax;
                 vaxData[j].y += unvax;
+
             } else{
             let totalvax = parseInt(worldData.get(iso)[j].people_vaccinated);
-            //let fullvax = parseInt(worldData.get(iso)[j].people_fully_vaccinated)
             
             if(isNaN(totalvax)){
                 totalvax = prevValuePV;
             }  
-            // if(isNaN(fullvax)){
-            //     fullvax = prevValuePFV;
-            // } 
            
             let unvax = parseInt(worldData.get(iso)[j].population) - totalvax
     
@@ -362,11 +367,9 @@ function buildVaxData(iso){
             totalVaccinated[j].y += totalvax;
 
             vaxData[j].x += totalvax;
-           // vaxData[j].y += fullvax;
             vaxData[j].y += unvax;
 
             prevValuePV = totalvax;
-           // prevValuePFV = fullvax;
             prevValueUV = unvax;
             } 
         }
@@ -430,7 +433,6 @@ function buildHospitalData(iso){
         } else{
             prevValue = 0; 
             for(let j = 0; j<totalHospitalisations.length;j++){
-                //console.log(worldData.get(iso) == undefined)
                 if(worldData.get(iso)[j] === undefined){
                     totalhosp = prevValue;
                     totalHospitalisations[j].y += totalhosp;
@@ -467,7 +469,6 @@ function buildDeathData(iso){
         } else{
             prevValue = 0; 
             for(let j = 0; j<totalDeaths.length;j++){
-                //console.log(worldData.get(iso) == undefined)
                 if(worldData.get(iso)[j] === undefined){
                     totaldeath = prevValue;
                     totalDeaths[j].y += totaldeath;

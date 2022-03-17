@@ -16,29 +16,30 @@ body{
 .chart_container{
     width: 840px;
     float:right;
-    
+    border-radius: 24px;
+    background-color: aliceblue;
 }
 .pie_container{
     width:650px; 
     float: left; 
+    border-radius: 24px;
+    background-color: aliceblue;
 }  
 .scatter_container{
-    width: 700px;
+    width: 840px;
     float:right;
-    
+    border-radius: 24px;
+    background-color: aliceblue;
+    margin-top: 82px;
 }
-
-.title_div{
-    width:662px;
-}
-
-.selectedCentroid{
-    fill:purple;
+.scat_svg{
+    margin-right:76px;
 }
 
 form{
     float:left;
-    vertical-align: middle;
+    margin-top: 125px;
+    margin-right: 4px;
 }
 
 h1{

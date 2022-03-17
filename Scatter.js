@@ -1,3 +1,5 @@
+// Declare global Variables
+
 const xSizeScat = 700; const ySizeScat = 350;
 const marginScat = 150;
 const xMaxScat = xSizeScat - marginScat*2;
@@ -20,15 +22,17 @@ let yScat = d3.scaleLinear();
 
 let ScatterCounter = 0;
 
+// Append a scatter container to the div
 const scatSvg = d3.select("body")
     .append("div")
     .attr("class","scatter_container")
     .append("svg")
-    .attr('width', xSizeScat )
+    .attr('width', 840 )
     .attr('height', ySizeScat )
     .append("g")
-    .attr("transform","translate(" + marginScat + "," + 75 + ")");
+    .attr("transform","translate(" + (marginScat+150) + "," + 75 + ")");
 
+// Setup the axes, the axes do not need to be updated for this plot so this is run once on init 
 function setupScatterAxes(data){
 
     /* Get the 'limits' of the data - the full extent (mins and max)
@@ -41,7 +45,7 @@ function setupScatterAxes(data){
     xScat.domain([ xExtentScat[0], xExtentScat[1] ])
         .range([0, xMaxScat]);
 
-        //Y Axis
+    //Y Axis
     yScat.domain([ yExtentScat[0], yExtentScat[1] ])
         .range([ yMaxScat, 0]);
 
@@ -77,8 +81,10 @@ function setupScatterAxes(data){
 
 }
 
+// Update the points on the chart
 function updateScatterChart(data,color){
     
+    // Remove old labels and scatter points
     let arr = [];
     
     scatSvg.selectAll(".chartLabel")
@@ -90,19 +96,23 @@ function updateScatterChart(data,color){
         .data(arr)
         .exit()
         .remove()
+
     
+    // Append new points
     scatSvg.selectAll("dot")
         .data(data)
         .enter()
         .append("circle")
         .attr("class","scatterPoint")
-        .attr("cx", function (d) { return xScat(d.x) } )
+        .attr("cx", function (d) { return xScat(d.x) } ) // Set x and y values using the data
         .attr("cy", function (d) { return yScat(d.y) } )
         .attr("r", 7.5)
-        .attr("fill", function(d) { return color(d.y) } )
+        .attr("fill", function(d) { return color(d.y) } ) // Set the color using the color scale passed in
         .attr("opacity","0.8")
         .attr("stroke","black")
         .on("mouseover",function(event,d,i){
+
+            // Append a label with the country to the top corner of the chart
 
             let arr = []
 
@@ -123,6 +133,7 @@ function updateScatterChart(data,color){
         })
         .on("mouseout",function(event,d,i){
 
+            // Remove country lables when mouse is not on dots
             let arr = []
 
             scatSvg.selectAll(".countryLabel")
@@ -130,10 +141,10 @@ function updateScatterChart(data,color){
                 .exit()
                 .remove()
             
-        })
-        .on("click",function(event,d,i){
-            
         });
+    
+
+    // Append chart title and axis labels
 
     scatSvg.append("text")
         .attr("x", xMaxScat/2 - 50)
@@ -151,6 +162,6 @@ function updateScatterChart(data,color){
         .attr("x", 0)
         .attr("y",-50)
         .attr("class","chartLabel")
-        .text("Excess mortalitay against GDP Per Capita")
+        .text("Excess Mortalitay Against GDP Per Capita")
         .style("font-size","19px")
 }
