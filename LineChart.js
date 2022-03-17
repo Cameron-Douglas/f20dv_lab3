@@ -233,6 +233,14 @@ function updateChart(data, country, iso, category,color,worlddata){
             multiCountry([],category,d.x,false,color); // TODO -- Potential Change Category?
             if(color != undefined){
                 update("none",color,worlddata,"part",d.x);
+                d3.select(".color_container")
+                .selectAll("text")
+                .remove()
+                
+                d3.select(".color_container")
+                    .append("text")
+                    .style("font-size","18px")
+                    .text("   Colored By: Vaccinations Per Hundred People")
             }
         });
 
