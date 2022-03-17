@@ -108,7 +108,7 @@ function updateScatterChart(data,color){
         .attr("cy", function (d) { return yScat(d.y) } )
         .attr("r", 7.5)
         .attr("fill", function(d) { return color(d.y) } ) // Set the color using the color scale passed in
-        .attr("opacity","0.8")
+        .attr("opacity","0.3")
         .attr("stroke","black")
         .on("mouseover",function(event,d,i){
 
@@ -121,7 +121,14 @@ function updateScatterChart(data,color){
             scatSvg.selectAll(".countryLabel")
                 .data(arr)
                 .exit()
-                .remove()
+                .remove();
+
+            d3.select(this)
+                .transition()
+                .duration(500)
+                .ease(d3.easeBounce)
+                .attr("opacity", "1")
+                .attr("r",10);
            
             scatSvg.append("text")
                 .attr("class","countryLabel")
@@ -129,7 +136,7 @@ function updateScatterChart(data,color){
                 .attr("y", 20)
                 .style("font-weight","bold")
                 .style("fill","steelblue")
-                .text(d.z)
+                .text(d.z);
         })
         .on("mouseout",function(event,d,i){
 
@@ -139,7 +146,14 @@ function updateScatterChart(data,color){
             scatSvg.selectAll(".countryLabel")
                 .data(arr)
                 .exit()
-                .remove()
+                .remove();
+            
+            d3.select(this)
+                .transition()
+                .duration(500)
+                .ease(d3.easeBounce)
+                .attr("r",7.5)
+                .attr("opacity","0.3");
             
         });
     
