@@ -1,6 +1,6 @@
 // Modified from code example: https://www.d3indepth.com/geographic/
 
-const width = 662;
+const width = 650;
 const height = 400;
 
 const Data = getWorldData();
@@ -9,6 +9,9 @@ const radioOptions = ["Vaccinations","Tests","Hospitalisations","Deaths"];
 
 const j = 0;
 
+let callCount = 0;
+
+let geo;
 
 let selected = "United Kingdom";
 let selectedISO = "GBR";
@@ -32,49 +35,30 @@ d3.select("body")
 
 let projection = d3.geoMercator()
 	.scale(95)
-	.translate([330, 285])
+	.translate([320, 283])
 	
 
 let geoGenerator = d3.geoPath()
 	.projection(projection);
 
-// let checkbox = ["Single","Area"];
+function update(geojson,color,data,category,day) {
 
-// let inputForm = d3.select(".map_container")
-//     .append("form")
+    if(geojson != "none"){
+        geo = geojson
+    }
 
-// inputs = inputForm.selectAll("label")
-//     .data(checkbox)
-//     .enter()
-//     .append("div")
-//         .attr("class","selectionType")
-//         .append("text")
-//         .text(function(d) {return d;})
-//         .append("input")
-//         .attr("type","radio")
-//         .attr("class","shape")
-//         .attr("name","mode")
-//         .property("checked", function(d, i) { 
-//             return (i===j); 
-//         })
-//         .attr("value", function(d, i) {return i;})
-    
-// let checkSelection = d3.select(".selectionType");
+    let arr = [];
 
-// checkSelection.on("change",function(event){
-//     //change(event.target.__data__)
-//     area();
-//     console.log("change")
-// });
+    d3.select(".map_svg")
+        .selectAll("path")
+        .remove()
 
-
-function update(geojson,color,data) {
-   
 	var u = d3.select('.map')
 		.selectAll('path')
-		.data(geojson.features);
+		.data(geo.features);
     
-   
+    console.log(data)
+
 	u.enter()
 		.append('path')
 		.attr('d', geoGenerator)
@@ -83,82 +67,47 @@ function update(geojson,color,data) {
         .attr("fill",function(d){
             let iso = d.properties.iso_a3;
             let thisColor;
-        
             if(iso === undefined || data.get(iso) === undefined){
                 thisColor = "#aaa"
             
             } else{
-                let index = data.get(iso).length - 1; 
-                let tdpm = data.get(iso)[index].total_cases_per_million;
-                thisColor = color(tdpm)
+                let index;
+                if(day === "max" || day > data.get(iso).length - 1){
+                    index = data.get(iso).length - 1;
+                } else{
+                    index = day
+                }
+                if(category === "cpm"){
+                    let tdpm = data.get(iso)[index].total_cases_per_million;
+                    thisColor = color(tdpm);
+                }
+                if(category === "part"){
+                    let vax = data.get(iso)[index].people_vaccinated_per_hundred;
+                    thisColor = color(vax);
+                }
+                if(category === "un"){
+                    
+                    let un = data.get(iso)[index].people_vaccinated_per_hundred;
+                    thisColor = color(un);
+
+                    if(thisColor === "rgb(0, 0, 0)"){
+                        thisColor = "#aaa"
+                    }
+                }
+               
+                
                 
             }
             return thisColor
             })
-        .attr("stroke","steelblue")
-        // .on('click', function(event,d,i){
-
-        //     // https://stackoverflow.com/questions/18005600/setting-a-color-for-click-event-on-a-d3-map
-
-        //     d3.select(".selected")  
-        //         .attr("class","unselected");
-
-        //     d3.select(this)
-        //         .attr("class","selected");
-            
-        //     if(d.properties.iso_a3 === undefined || data.get(d.properties.iso_a3) === undefined){
-
-        //     } else{
-        //         selected = d.properties.name_long 
-        //         selectedISO = d.properties.iso_a3
-        //         initialise(selectedISO,"max","Vaccinations");
-
-        //         d3.select(".shape")
-        //         .property("checked", function(d, i) { 
-        //             return (i===j); 
-        //         });
-        //     }
-        // })
-		// .on('mouseover', function(event,d,i){
-        //     let centroid = geoGenerator.centroid(d);
-        //     let tmp = [];
-        
-        //     d3.select(".country_label")
-        //         .data(tmp)
-        //         .exit()
-        //         .remove()
-
-
-        //     if(d.properties.iso_a3 === undefined || data.get(d.properties.iso_a3) === undefined){
-        //         d3.select("svg").append("text")
-        //             .attr("class","country_label")
-        //             .text(d.properties.name_long + ": No Data")
-        //     } else{
-        //         d3.select("svg").append("text")
-        //         .attr("class","country_label")
-        //         .text(d.properties.name_long)
-        //     }
-
-        //     d3.selectAll(".country_label")
-        //     .attr("x",width/2)
-        //         .attr("y",25)
-        //         .style("font-size","19px")
-        //         .style("text-decoration","underline")
-        // })
-        // .on('mouseleave', function(event,d,i){
-            
-        //     let tmp = [];
-            
-        //     d3.select(".country_label")
-        //         .data(tmp)
-        //         .exit()
-        //         .remove()
-        // })
-        ;
-        d3.select("#GBR")
-            .attr("class","selected");
-        d3.select("#IRL")
-            .attr("class","selected");
+        .attr("stroke","steelblue");
+        if(callCount === 0){
+            d3.select("#GBR")
+                .attr("class","selected");
+            d3.select("#IRL")
+                .attr("class","selected");
+            callCount ++;
+        }
     
         
     var brush = d3.select(".map_svg")

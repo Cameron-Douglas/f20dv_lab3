@@ -9,7 +9,7 @@ body{
 
 .map_container{
     
-    width: 662px;
+    width: 650px;
     float:left;
    
 }
@@ -19,7 +19,7 @@ body{
     
 }
 .pie_container{
-    width:662px; 
+    width:650px; 
     float: left; 
 }  
 .scatter_container{
@@ -44,4 +44,18 @@ form{
 h1{
     text-align: center;
 }
-    
+
+.resetButton {
+    text-align: center;
+    font-family: monospace;
+    border: solid steelblue;
+    border-radius:8px;
+    background-color: rgb(232, 243, 255);
+    transition-duration: 0.4s;
+    cursor: pointer;
+  }
+.resetButton:hover {
+    background-color: steelblue;
+    color: white;
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}

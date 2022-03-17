@@ -79,27 +79,13 @@ function setupScatterAxes(data){
 
 function updateScatterChart(data,color){
     
-    let tmp = [];
-    
-    scatSvg.selectAll(".marker")
-        .data(tmp)
-        .exit()
-        .remove()
+    let arr = [];
     
     scatSvg.selectAll(".chartLabel")
-        .data(tmp)
-        .exit()
-        .remove()
-    
-    scatSvg.selectAll(".label")
-        .data(tmp)
+        .data(arr)
         .exit()
         .remove();
-
-    //updateScatterAxes(data)
     
-    let arr = [0];
-
     scatSvg.selectAll(".scatterPoint")
         .data(arr)
         .exit()
@@ -113,7 +99,8 @@ function updateScatterChart(data,color){
         .attr("cx", function (d) { return xScat(d.x) } )
         .attr("cy", function (d) { return yScat(d.y) } )
         .attr("r", 7.5)
-        .attr("fill", function(d) { return color(d.y) })
+        .attr("fill", function(d) { return color(d.y) } )
+        .attr("opacity","0.8")
         .attr("stroke","black")
         .on("mouseover",function(event,d,i){
 
@@ -128,9 +115,10 @@ function updateScatterChart(data,color){
            
             scatSvg.append("text")
                 .attr("class","countryLabel")
-                .attr("x",xScat(d.x) + 15)
-                .attr("y",yScat(d.y) + 2)
+                .attr("x", 20)
+                .attr("y", 20)
                 .style("font-weight","bold")
+                .style("fill","steelblue")
                 .text(d.z)
         })
         .on("mouseout",function(event,d,i){

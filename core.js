@@ -85,11 +85,36 @@ d3.csv(locations, function(data) {
     d3.json('https://raw.githubusercontent.com/cd94/f20dv_lab3/master/custom.geo.json')
     .then(function(json) {
         geoJSON = json
-        update(json,color,worldData,"cpm","max")
+        update(geoJSON,color,worldData,"cpm","max")
+
+        d3.select(".map_container")
+            .append("div")
+            .attr("class","color_container") 
+            .style("border-style","solid")
+            .style("border-radius","12px")
+            .style("border-color","steelblue")
+            .style("padding","10px 10px 10px 10px")  
+            .style("margin-top","10px")
+            .style("margin-bottom","10px")
+        
+        d3.select(".color_container")
+            .append("input")
+            .attr("type","button")
+            .attr("class","resetButton")
+            .attr("value","Reset Color")
+            .attr("onclick","update(\"none\",color,worldData,\"cpm\",\"max\")")
+
+        d3.select(".color_container")
+            .append("text")
+            .style("font-size","18px")
+            .text("   Colored By: Cases Per Million") 
+
     });
     // worldData.forEach(function(value,key){
         
     // })
+
+ 
 
     multiCountry(['GBR','IRL'],"Vaccinations", "max", true)
     
@@ -112,16 +137,17 @@ function initialisePie(day){
     
   
     let pieData = []
+    console.log(vaxData)
     pieData.push(vaxData[currDay].x,vaxData[currDay].y);
 
     console.log(pieData)
     
     //console.log(vaxData[currDay])
 
-    updatePie(worldData,vaxData,pieData,"Selected Region","iso",currDay,geoJSON);
+    updatePie(worldData,vaxData,pieData,"Selected Region","iso",currDay);
 }
 
-function multiCountry(list, category, day, update){
+function multiCountry(list, category, day, update, color){
 
     if(list.length !== 0){
       
@@ -143,20 +169,21 @@ function multiCountry(list, category, day, update){
 
     prevValue = 0;
     var countries = d3.select(".map_container")
+
     if(initCounter === 0){
         setupAxes(totalVaccinated, "Selected Region", category);
         setupScatterAxes(fullScatterData)
 
-        // countries
-        //     .append("div")
-        //     .attr("class","countryContainer")
-        //     .style("border-style","solid")
-        //     .style("border-radius","12px")
-        //     .style("border-color","steelblue")
-        //     .style("padding","10px 10px 10px 10px")
-        //     .append("text")
-        //     .text("Selected Countries: ")
-        //     .style("font-size","18px")
+        countries
+            .append("div")
+            .attr("class","countryContainer")
+            .style("border-style","solid")
+            .style("border-radius","12px")
+            .style("border-color","steelblue")
+            .style("padding","10px 10px 10px 10px")
+            .append("text")
+            .text("Selected Countries: ")
+            .style("font-size","18px")
         initCounter++;
     }
     if(update){
@@ -182,6 +209,15 @@ function multiCountry(list, category, day, update){
             
         }
     }
+
+    d3.select(".color_container")
+                    .selectAll("text")
+                    .remove()
+
+    d3.select(".color_container")
+            .append("text")
+            .style("font-size","18px")
+            .text("   Colored By: Cases Per Million") 
     
     if(category === "Vaccinations"){
 
@@ -191,9 +227,21 @@ function multiCountry(list, category, day, update){
             }
         // console.log(totalVaccinated)
         }
-        updateChart(totalVaccinated,"Selected Region","iso",category)
+        updateChart(totalVaccinated,"Selected Region","iso",category,color,worldData)
         initialisePie(initDay)
     }
+
+    if(category === "Un-Vaccinated"){
+        for(let i = 0; i<listCountries.length;i++){
+            if(worldData.get(listCountries[i])!==undefined){
+                buildVaxData(listCountries[i])
+            }
+        // console.log(totalVaccinated)
+        }
+        console.log(initDay)
+        initialisePie(initDay)
+    }
+    
     if(category === "Tests"){
         
         for(let i = 0; i<listCountries.length;i++){

@@ -1,6 +1,6 @@
 
 // Initialise SVG properties
-    let pieWidth = 662,
+    let pieWidth = 650,
         pieHeight = 275,
         radius = Math.min(pieWidth, pieHeight) / 2;
 
@@ -10,17 +10,18 @@
 
     let fullData = [];
 
+    let worlddata;
+
     let vaccinated = [];
     let fullVax = [];
     let unVax = [];
 
     let currCountry;
 
-    let colorPart = d3.scaleLinear();
-    let colorFull = d3.scaleLinear(); 
-    let colorUn = d3.scaleLinear();
+    let currDay;
 
-    let updateJSON;
+    let colorPart = d3.scaleLinear();
+    
 
     // Initialise pie let#iable
     let pie = d3.pie()
@@ -67,8 +68,8 @@
                 .transition()
                 .ease(d3.easeBounce)
                 .duration(1000)
-                .attr('d',function(d){return d3.arc().innerRadius(50)
-                     .outerRadius(110)(d)})
+                .attr('d',function(d){return d3.arc().innerRadius(radius - 100)
+                     .outerRadius((radius - 50) + 10)(d)})
                 .attr("stroke","#ffff")
                 .attr("stroke-width","2px");
 
@@ -107,8 +108,8 @@
                 .transition()
                 .ease(d3.easeBounce)
                 .duration(500)
-                .attr('d',function(d){return d3.arc().innerRadius(50)
-                    .outerRadius(100)(d)})
+                .attr('d',function(d){return d3.arc().innerRadius(radius - 100)
+                    .outerRadius(radius - 50)(d)})
                     .attr("stroke","none");
         })
         .on("click",function(event,d,i){
@@ -122,8 +123,16 @@
                     vaccinated.push({x:i, y:fullData[i].x})
                     
                 }
-                updateChart(vaccinated, currCountry, iso, "Vaccinations");
-                // update(updateJSON,colorPart,fullData,"part",day);
+                updateChart(vaccinated, currCountry, iso, "Vaccinations",colorPart,worlddata);
+                update("none",colorPart,worlddata,"part",currDay);
+                d3.select(".color_container")
+                    .selectAll("text")
+                    .remove()
+
+                d3.select(".color_container")
+                    .append("text")
+                    .style("font-size","18px")
+                    .text("   Colored By: Vaccinations Per Hundred People")
                 vaccinated = [];
        
             }
@@ -133,8 +142,16 @@
                     unVax.push({x:i, y:fullData[i].y})
                     
                 }
-                updateChart(unVax, currCountry, iso, "Un-Vaccinated");
-                // update(updateJSON,colorUn,fullData,"un",day);
+                updateChart(unVax, currCountry, iso, "Un-Vaccinated",colorPart,worlddata);
+                update("none",colorPart,worlddata,"un",currDay);
+                d3.select(".color_container")
+                    .selectAll("text")
+                    .remove()
+
+                d3.select(".color_container")
+                    .append("text")
+                    .style("font-size","18px")
+                    .text("   Colored By: Vaccinations Per Hundred People")
                 unVax = [];
             }
           
@@ -153,8 +170,8 @@
         .data(keys)
         .enter()
         .append("circle")
-            .attr("cx", 75)
-            .attr("cy", function(d,i){ return 90 + i*25}) // 100 is where the first dot appears. 25 is the distance between dots
+            .attr("cx", 90)
+            .attr("cy", function(d,i){ return 60 + i*25}) // 100 is where the first dot appears. 25 is the distance between dots
             .attr("r", 7)
             .style("fill", function(d){ return keycolor(d)})
 
@@ -162,20 +179,19 @@
         .data(keys)
         .enter()
         .append("text")
-            .attr("x", 95)
-            .attr("y", function(d,i){ return 90 + i*25}) // 100 is where the first dot appears. 25 is the distance between dots
+            .attr("x", 115)
+            .attr("y", function(d,i){ return 60 + i*25}) // 100 is where the first dot appears. 25 is the distance between dots
             .style("fill", function(d){ return color(d)})
             .text(function(d){ return d})
             .attr("text-anchor", "left")
             .style("alignment-baseline", "middle")
-
       
     }
 
     // Update function called on button press
-    function updatePie(worldData,fullDataset,dataset,country,iso,day,json){
+    function updatePie(worldData,fullDataset,dataset,country,iso,day){
 
-        updateJSON = json
+        currDay = day;
 
         updateCountry(country);
         population = 0;
@@ -185,22 +201,19 @@
 
         fullData = fullDataset
 
-        let part = []
-        let full = []
-        let un = []
+        worlddata = worldData
 
-        // worldData.forEach(function(value){
-        //     console.log(value)
-        //     part.push(value[value.length-1].people_vaccinated)
-        //     full.push(value[value.length-1].people_fully_vaccinated)
-        //     un.push(value[value.length-1].population - value[value.length-1].people_vaccinated)
-        // })
-        // colorPart = d3.scaleLinear().domain([d3.min(part),d3.max(part)]).range(["green", "orange"]);
-        // colorFull = d3.scaleLinear().domain([d3.min(full),d3.max(full)]).range(["green", "orange"]);
-        // colorUn = d3.scaleLinear().domain([d3.min(un),d3.max(un)]).range(["green", "orange"]);
+        let part = []
+
+        worldData.forEach(function(value){
+            part.push(value[value.length-1].people_vaccinated_per_hundred)
+            
+        })
+        colorPart = d3.scaleLinear().domain([d3.min(part),d3.max(part)]).range(["orange", "green"]);
+        
     
         if(counter == 0){
-            draw(dataset,currCountry,day)
+            draw(dataset,currCountry)
             let tmp = [];
 
             let v = pieSvg.selectAll(".pie_header")

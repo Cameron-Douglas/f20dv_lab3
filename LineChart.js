@@ -149,8 +149,9 @@ function updateAxes(data){
         .call(d3.axisTop(x))
 }
 
-function updateChart(data, country, iso, category){
+function updateChart(data, country, iso, category,color,worlddata){
     
+
     let tmp = [];
     
     svg.selectAll(".marker")
@@ -228,7 +229,11 @@ function updateChart(data, country, iso, category){
                 .style("opacity",0)
         })
         .on("click",function(event,d,i){
-            multiCountry([],category,d.x,false); // TODO -- Potential Change Category?
+            //console.log(worlddata)
+            multiCountry([],category,d.x,false,color); // TODO -- Potential Change Category?
+            if(color != undefined){
+                update("none",color,worlddata,"part",d.x);
+            }
         });
 
         svg.append("text")
