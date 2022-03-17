@@ -1,7 +1,7 @@
 
 // Initialise SVG properties
     let pieWidth = 662,
-        pieHeight = 300,
+        pieHeight = 275,
         radius = Math.min(pieWidth, pieHeight) / 2;
 
     let counter = 0;
@@ -50,9 +50,9 @@
 
         updateCountry(country)
             // Define color ranges
-        let color =  d3.scaleOrdinal().domain(dataset).range(["YellowGreen", "Green", "Orange"]);
-        let keys = ["Partially Vaccinated", "Fullly Vaccinated","Unvaccinated"];
-        let keycolor =  d3.scaleOrdinal().domain(keys).range(["YellowGreen", "Green", "Orange"]);
+        let color =  d3.scaleOrdinal().domain(dataset).range(["YellowGreen","Orange"]);
+        let keys = ["Vaccinated","Unvaccinated"];
+        let keycolor =  d3.scaleOrdinal().domain(keys).range(["YellowGreen" , "Orange"]);
 
         let path = pieSvg.selectAll("path")
         .data(pie(dataset))
@@ -78,6 +78,7 @@
                 .attr("y", -70)
                 .attr("class","pie_label")
                 .text(function(){
+                    //console.log(population)
                     let percentage = Math.round(d.data/population*100);
                     return percentage+"%"})
                 .style("font-size", 18)
@@ -88,9 +89,6 @@
                         thisColor = "YellowGreen"
                     }
                     if(d.index === 1){
-                        thisColor = "Green"
-                    }
-                    if(d.index === 2){
                         thisColor = "Orange"
                     }
                     return thisColor
@@ -124,7 +122,7 @@
                     vaccinated.push({x:i, y:fullData[i].x})
                     
                 }
-                updateChart(vaccinated, currCountry, iso, "Partialy Vaccinated");
+                updateChart(vaccinated, currCountry, iso, "Vaccinations");
                 // update(updateJSON,colorPart,fullData,"part",day);
                 vaccinated = [];
        
@@ -132,17 +130,7 @@
             if(index === 1){
                 for(let i = 0; i<fullData.length; i++){
                     
-                    fullVax.push({x:i, y:fullData[i].y})
-                    
-                }
-                updateChart(fullVax, currCountry, iso, "Fully Vaccinated");
-                // update(updateJSON,colorFull,fullData,"full",day);
-                fullVax = [];
-            }
-            if(index === 2){
-                for(let i = 0; i<fullData.length; i++){
-                    
-                    unVax.push({x:i, y:fullData[i].z})
+                    unVax.push({x:i, y:fullData[i].y})
                     
                 }
                 updateChart(unVax, currCountry, iso, "Un-Vaccinated");
@@ -192,13 +180,10 @@
         updateCountry(country);
         population = 0;
 
-        for(let i = 0;i<dataset.length;i++){
-            population += dataset[i];
-        }
+        population += dataset[0];
+        population += dataset[1];
 
         fullData = fullDataset
-
-        console.log(fullData)
 
         let part = []
         let full = []

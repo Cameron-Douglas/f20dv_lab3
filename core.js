@@ -12,6 +12,7 @@ let listCountries = [];
 let initDay = "max";
 
 var color;
+var scatterColor;
 
 let initCounter = 0;
 
@@ -19,10 +20,15 @@ let prevValue = 0;
 let prevValuePV = 0;
 let prevValuePFV = 0;
 let prevValueUV = 0;
+let prevValueW = 0;
+let prevValueE = 0;
 
 let totalTests = [];
 let totalHospitalisations = [];
 let totalDeaths = [];
+
+let scatterData = [];
+let fullScatterData = [];
 
 
 console.log("Building Data...")
@@ -54,14 +60,22 @@ d3.csv(locations, function(data) {
     }
 
     let deaths = [];
+    let excessMort = [];
   
     // worldData.forEach((value,key)=>locs.push(key));
     
-    worldData.forEach(function(value){
+    worldData.forEach(function(value,key){
         deaths.push(value[value.length-1].total_cases_per_million)
+        buildScatterData(key,"full")
     })
 
+    for(let i=0;i<fullScatterData.length;i++){
+        excessMort.push(fullScatterData[i].y);
+    }
+
     color = d3.scaleLinear().domain([d3.min(deaths),d3.max(deaths)]).range(["green", "orange"]);
+    scatterColor = d3.scaleLinear().domain([d3.min(excessMort),d3.max(excessMort)]).range(["yellowGreen", "orange"]);
+
 
     console.log("Ready...")
 
@@ -73,6 +87,10 @@ d3.csv(locations, function(data) {
         geoJSON = json
         update(json,color,worldData,"cpm","max")
     });
+    // worldData.forEach(function(value,key){
+        
+    // })
+
     multiCountry(['GBR','IRL'],"Vaccinations", "max", true)
     
 });
@@ -94,7 +112,9 @@ function initialisePie(day){
     
   
     let pieData = []
-    pieData.push(vaxData[currDay].x,vaxData[currDay].y,vaxData[currDay].z);
+    pieData.push(vaxData[currDay].x,vaxData[currDay].y);
+
+    console.log(pieData)
     
     //console.log(vaxData[currDay])
 
@@ -114,6 +134,7 @@ function multiCountry(list, category, day, update){
     totalTests = [];
     totalHospitalisations = [];
     totalDeaths = [];
+    scatterData = [];
     vaxData = [];
     
     prevValuePV = 0;
@@ -124,16 +145,18 @@ function multiCountry(list, category, day, update){
     var countries = d3.select(".map_container")
     if(initCounter === 0){
         setupAxes(totalVaccinated, "Selected Region", category);
-        countries
-            .append("div")
-            .attr("class","countryContainer")
-            .style("border-style","solid")
-            .style("border-radius","12px")
-            .style("border-color","steelblue")
-            .style("padding","10px 10px 10px 10px")
-            .append("text")
-            .text("Selected Countries: ")
-            .style("font-size","18px")
+        setupScatterAxes(fullScatterData)
+
+        // countries
+        //     .append("div")
+        //     .attr("class","countryContainer")
+        //     .style("border-style","solid")
+        //     .style("border-radius","12px")
+        //     .style("border-color","steelblue")
+        //     .style("padding","10px 10px 10px 10px")
+        //     .append("text")
+        //     .text("Selected Countries: ")
+        //     .style("font-size","18px")
         initCounter++;
     }
     if(update){
@@ -169,7 +192,6 @@ function multiCountry(list, category, day, update){
         // console.log(totalVaccinated)
         }
         updateChart(totalVaccinated,"Selected Region","iso",category)
-        console.log(vaxData)
         initialisePie(initDay)
     }
     if(category === "Tests"){
@@ -209,6 +231,17 @@ function multiCountry(list, category, day, update){
         updateChart(totalDeaths,"Selected Region","iso",category)
         initialisePie(initDay)
     }
+    for(let i = 0; i<listCountries.length;i++){
+        if(worldData.get(listCountries[i])!==undefined){
+            buildScatterData(listCountries[i],"part")
+            //console.log(scatterData)
+            
+        }
+     
+    }
+    updateScatterChart(scatterData,scatterColor)
+
+    
 }
 
 function buildVaxData(iso){
@@ -218,14 +251,17 @@ function buildVaxData(iso){
         for(let i = 0; i<worldData.get(iso).length;i++){
 
             let totalvax = parseInt(worldData.get(iso)[i].people_vaccinated);
-            let fullvax = parseInt(worldData.get(iso)[i].people_fully_vaccinated)
+            //let fullvax = parseInt(worldData.get(iso)[i].people_fully_vaccinated)
+
+            
             
             if(isNaN(totalvax)){
                 totalvax = prevValuePV;
             }  
-            if(isNaN(fullvax)){
-                fullvax = prevValuePFV;
-            } 
+            // if(isNaN(fullvax)){
+            //     fullvax = prevValuePFV;
+            // } 
+
 
             let unvax = parseInt(worldData.get(iso)[i].population) - totalvax
 
@@ -234,10 +270,10 @@ function buildVaxData(iso){
             }  
 
             totalVaccinated.push({x:i,y:totalvax});
-            vaxData.push({x:totalvax,y:fullvax,z:unvax});            
+            vaxData.push({x:totalvax,y:unvax});            
 
             prevValuePV = totalvax;
-            prevValuePFV = fullvax;
+           // prevValuePFV = fullvax;
             prevValueUV = unvax;
         }
         
@@ -250,25 +286,25 @@ function buildVaxData(iso){
             //console.log(worldData.get(iso) == undefined)
             if(worldData.get(iso)[j] === undefined){
                 totalvax = prevValuePV;
-                fullvax = prevValuePFV;
+                //fullvax = prevValuePFV;
                 unvax = prevValueUV;
 
                 totalVaccinated[j].y += totalvax;
 
                 vaxData[j].x += totalvax;
-                vaxData[j].y += fullvax;
-                vaxData[j].z += unvax;
+                //vaxData[j].y += fullvax;
+                vaxData[j].y += unvax;
             } else{
             let totalvax = parseInt(worldData.get(iso)[j].people_vaccinated);
-            let fullvax = parseInt(worldData.get(iso)[j].people_fully_vaccinated)
+            //let fullvax = parseInt(worldData.get(iso)[j].people_fully_vaccinated)
             
             if(isNaN(totalvax)){
                 totalvax = prevValuePV;
             }  
-            if(isNaN(fullvax)){
-                fullvax = prevValuePFV;
-            } 
-    
+            // if(isNaN(fullvax)){
+            //     fullvax = prevValuePFV;
+            // } 
+           
             let unvax = parseInt(worldData.get(iso)[j].population) - totalvax
     
             if(isNaN(unvax)){
@@ -278,11 +314,11 @@ function buildVaxData(iso){
             totalVaccinated[j].y += totalvax;
 
             vaxData[j].x += totalvax;
-            vaxData[j].y += fullvax;
-            vaxData[j].z += unvax;
+           // vaxData[j].y += fullvax;
+            vaxData[j].y += unvax;
 
             prevValuePV = totalvax;
-            prevValuePFV = fullvax;
+           // prevValuePFV = fullvax;
             prevValueUV = unvax;
             } 
         }
@@ -400,4 +436,33 @@ function buildDeathData(iso){
                 } 
             }
         }
+    }
+
+function buildScatterData(iso,dataset){
+        
+            // Building dataset for number of people vaccinated for line chart
+            let index = worldData.get(iso).length - 1
+                for(let i = 0; i<worldData.get(iso).length;i++){
+        
+                    var wealth = parseInt(worldData.get(iso)[i].gdp_per_capita);
+                    var excess = parseInt(worldData.get(iso)[i].excess_mortality);
+                    
+                    if(isNaN(wealth)){
+                        wealth = prevValueW;
+                    }  
+                    if(isNaN(excess)){
+                        excess = prevValueE;
+                    } 
+        
+                    prevValueW = wealth;
+                    prevValueE = excess;
+                } 
+            if(dataset === "part"){
+                scatterData.push({x:wealth,y:excess,z:worldData.get(iso)[0].location});
+            }
+            if(dataset === "full"){
+                fullScatterData.push({x:wealth,y:excess});
+            }
+
+            
 }

@@ -1,7 +1,7 @@
-const xSize = 700; const ySize = 600;
+const xSize = 700; const ySize = 350;
 const margin = 150;
 const xMax = xSize - margin*2;
-const yMax = ySize - margin*2;
+const yMax = ySize - margin;
 
 const transitionSpeed = 1000;
 

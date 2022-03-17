@@ -19,9 +19,18 @@ body{
     
 }
 .pie_container{
-    width:662px;
-    
+    width:662px; 
+    float: left; 
 }  
+.scatter_container{
+    width: 700px;
+    float:right;
+    
+}
+
+.title_div{
+    width:662px;
+}
 
 .selectedCentroid{
     fill:purple;

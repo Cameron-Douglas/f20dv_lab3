@@ -1,7 +1,7 @@
 // Modified from code example: https://www.d3indepth.com/geographic/
 
 const width = 662;
-const height = 475;
+const height = 400;
 
 const Data = getWorldData();
 
@@ -31,8 +31,8 @@ d3.select("body")
 
 
 let projection = d3.geoMercator()
-	.scale(105)
-	.translate([330, 325])
+	.scale(95)
+	.translate([330, 285])
 	
 
 let geoGenerator = d3.geoPath()
