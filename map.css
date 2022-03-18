@@ -60,3 +60,10 @@ h1{
     color: white;
     box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
 }
+
+.loading{
+    font-size:24px;
+    margin-top: 400px;
+    margin-left: 624px;
+    margin-bottom: 500px;
+}

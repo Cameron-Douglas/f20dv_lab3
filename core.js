@@ -13,6 +13,8 @@ let listCountries = [];
 
 let initDay = "max";
 
+let currColoring;
+
 var color;
 var scatterColor;
 
@@ -34,6 +36,11 @@ let fullScatterData = [];
 
 
 console.log("Building Data...")
+
+d3.select("body")
+    .append("div")
+    .attr("class","loading")
+    .text("Loading Visualisation...")
 
 // Load in COVID data from git hub
 d3.csv(locations, function(data) {
@@ -114,12 +121,23 @@ d3.csv(locations, function(data) {
             .append("text")
             .style("font-size","18px")
             .text("   Colored By: Cases Per Million") 
+        
+        currColoring = "cpm"
 
     });
-
+    
+    d3.select(".loading")
+        .style("opacity",1)
+        .transition()
+        .duration(250)
+        .style("opacity",0)
+        .style("margin-top","0px")
+        .style("margin-left","0px")
+        .style("margin-bottom","0px")
+    
+    
     // Initialise the graphs and datasets 
     multiCountry(['GBR','IRL'],"Vaccinations", "max", true)
-    
 });
 
 // Initialise the pie chart with a day
@@ -138,6 +156,7 @@ function initialisePie(day){
 
 // Build data
 function multiCountry(list, category, day, update, color){
+
 
     if(list.length !== 0){
         listCountries = list;
@@ -165,6 +184,7 @@ function multiCountry(list, category, day, update, color){
 
     // If initialising, setup the axes for the plots and the div for the list of countries selected 
     if(initCounter === 0){
+
         setupAxes(totalVaccinated);
         setupScatterAxes(fullScatterData)
 
@@ -207,14 +227,28 @@ function multiCountry(list, category, day, update, color){
     }
 
     // Display how the map is currently being colored
-    d3.select(".color_container")
-                    .selectAll("text")
-                    .remove()
 
-    d3.select(".color_container")
+    if(currColoring === "cpm"){
+        d3.select(".color_container")
+                        .selectAll("text")
+                        .remove()
+
+        d3.select(".color_container")
+                .append("text")
+                .style("font-size","18px")
+                .text("   Colored By: Cases Per Million") 
+    }
+
+    if(currColoring === "vax"){
+        d3.select(".color_container")
+        .select("text")
+        .remove()
+        
+        d3.select(".color_container")
             .append("text")
             .style("font-size","18px")
-            .text("   Colored By: Cases Per Million") 
+            .text("   Colored By: Vaccinated per Hundred People") 
+    }
     
     /*BUILD THE APPROPRIATE DATASETS FROM THE LIST OF COUNTRIES USING THE HELPER FUNCTIONS DEFINED BELOW */
 
@@ -237,7 +271,6 @@ function multiCountry(list, category, day, update, color){
             }
         // console.log(totalVaccinated)
         }
-        console.log(initDay)
         initialisePie(initDay)
     }
     

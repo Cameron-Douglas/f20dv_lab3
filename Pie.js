@@ -65,6 +65,8 @@
             .enter().append("path")
             .attr("fill", function(d, i) { return color(i); })
             .attr("d", arc)
+            .attr("stroke","steelblue")
+            .attr("stroke-width","1px")
             .on("mouseover",function(event,d,i){
 
                 // Grow the segment on mouseover
@@ -74,7 +76,7 @@
                     .duration(1000)
                     .attr('d',function(d){return d3.arc().innerRadius(radius - 100)
                         .outerRadius((radius - 50) + 10)(d)})
-                    .attr("stroke","#ffff")
+                    .attr("stroke","steelblue")
                     .attr("stroke-width","2px");
                 
                 // Append label showing the percentage for that segment
@@ -118,7 +120,8 @@
                     .duration(500)
                     .attr('d',function(d){return d3.arc().innerRadius(radius - 100)
                         .outerRadius(radius - 50)(d)})
-                        .attr("stroke","none");
+                        .attr("stroke","steelblue")
+                        .attr("stroke-width","1px");
             })
             .on("click",function(event,d,i){
 
@@ -140,14 +143,14 @@
                     update("none",colorPart,worlddata,"part",currDay);
 
                     //... and update the coloring label displayed under the map
-                    d3.select(".color_container")
-                        .selectAll("text")
-                        .remove()
+                    // d3.select(".color_container")
+                    //     .selectAll("text")
+                    //     .remove()
 
-                    d3.select(".color_container")
-                        .append("text")
-                        .style("font-size","18px")
-                        .text("   Colored By: Vaccinations Per Hundred People")
+                    // d3.select(".color_container")
+                    //     .append("text")
+                    //     .style("font-size","18px")
+                    //     .text("   Colored By: Vaccinations Per Hundred People")
                     vaccinated = [];
         
                 }
@@ -167,14 +170,14 @@
 
                     update("none",colorPart,worlddata,"un",currDay);
 
-                    d3.select(".color_container")
-                        .selectAll("text")
-                        .remove()
+                    // d3.select(".color_container")
+                    //     .selectAll("text")
+                    //     .remove()
 
-                    d3.select(".color_container")
-                        .append("text")
-                        .style("font-size","18px")
-                        .text("   Colored By: Vaccinations Per Hundred People")
+                    // d3.select(".color_container")
+                    //     .append("text")
+                    //     .style("font-size","18px")
+                    //     .text("   Colored By: Vaccinations Per Hundred People")
                     unVax = [];
                 }
             
@@ -202,6 +205,7 @@
             .attr("cy", function(d,i){ return 60 + i*25}) // 100 is where the first dot appears. 25 is the distance between dots
             .attr("r", 7)
             .style("fill", function(d){ return keycolor(d)})
+            .style("stroke","steelblue")
 
         pieSvg.selectAll("mylabels")
         .data(keys)

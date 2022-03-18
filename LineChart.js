@@ -270,14 +270,14 @@ function updateChart(data, country, category, color, worlddata){
                 update("none",color,worlddata,"part",d.x);
 
                 // Update the color container to show how the map is being colored
-                d3.select(".color_container")
-                    .selectAll("text")
-                    .remove()
+                // d3.select(".color_container")
+                //     .selectAll("text")
+                //     .remove()
 
-                d3.select(".color_container")
-                    .append("text")
-                    .style("font-size","18px")
-                    .text("   Colored By: Vaccinations Per Hundred People")
+                // d3.select(".color_container")
+                //     .append("text")
+                //     .style("font-size","18px")
+                //     .text("   Colored By: Vaccinations Per Hundred People")
             }
         });
 

@@ -1,6 +1,5 @@
 // Modified from code example: https://www.d3indepth.com/geographic/
 
-
 // Declaring global variables
 
 const width = 650;
@@ -81,15 +80,43 @@ function update(geojson,color,data,category,day) {
                 if(category === "cpm"){
                     let tdpm = data.get(iso)[index].total_cases_per_million;
                     thisColor = color(tdpm);
+                    d3.select(".color_container")
+                        .select("text")
+                        .remove()
+
+                    d3.select(".color_container")
+                        .append("text")
+                        .style("font-size","18px")
+                        .text("   Colored By: Cases Per Million") 
+                    
+                    currColoring = "cpm";
                 }
                 if(category === "part"){
                     let vax = data.get(iso)[index].people_vaccinated_per_hundred;
                     thisColor = color(vax);
+                    d3.select(".color_container")
+                        .select("text")
+                        .remove()
+                        
+                    d3.select(".color_container")
+                        .append("text")
+                        .style("font-size","18px")
+                        .text("   Colored By: Vaccinated per Hundred People") 
+                    currColoring = "vax";
                 }
                 if(category === "un"){
                     
                     let un = data.get(iso)[index].people_vaccinated_per_hundred;
                     thisColor = color(un);
+                    d3.select(".color_container")
+                        .select("text")
+                        .remove()
+                        
+                    d3.select(".color_container")
+                        .append("text")
+                        .style("font-size","18px")
+                        .text("   Colored By: Vaccinated per Hundred People") 
+                    currColoring = "vax";
 
                     // If values are missing, this will cause the color scale to return black,
                     // for aesthetics I make it return grey insted.
