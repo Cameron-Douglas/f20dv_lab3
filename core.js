@@ -84,7 +84,7 @@ d3.csv(locations, function(data) {
     }
 
     // Create color scales for the inital map and for the scatter plot
-    color = d3.scaleLinear().domain([d3.min(cases),d3.max(cases)]).range(["green", "orange"]);
+    color = d3.scaleLinear().domain([d3.min(cases),d3.max(cases)]).range(["orange", "green"]);
     scatterColor = d3.scaleLinear().domain([d3.min(excessMort),d3.max(excessMort)]).range(["yellowGreen", "orange"]);
 
 
